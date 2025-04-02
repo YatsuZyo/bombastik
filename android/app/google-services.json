@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "445862316836",
+    "project_id": "bombastik-b4301",
+    "storage_bucket": "bombastik-b4301.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445862316836:android:f36811669997f6d66601b1",
+        "android_client_info": {
+          "package_name": "com.example.bombastik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2Wo0REpje-G7P-7KkPAsFGnmXfE3g8Ng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

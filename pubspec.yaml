@@ -1,0 +1,78 @@
+name: bombastik
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  animated_splash_screen: ^1.3.0
+  animations: ^2.0.11
+  build_runner: ^2.4.15
+  cached_network_image: ^3.4.1
+  cloud_firestore: ^5.6.5
+  dio: ^5.8.0+1
+  firebase_auth: ^5.5.1
+  firebase_core: ^3.12.1
+  firebase_storage: ^12.4.4
+  flutter:
+    sdk: flutter
+  flutter_animate: ^4.5.2
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  google_fonts: ^6.2.1
+  google_sign_in: ^6.3.0
+  hooks_riverpod: ^2.6.1
+  http: ^1.3.0
+  image_cropper: ^9.0.0
+  image_picker: ^1.1.2
+  provider: ^6.1.2
+  riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  riverpod_generator: ^2.6.5
+  riverpod_lint: ^2.6.5
+  shared_preferences: ^2.5.3
+  simple_animations: ^5.1.0
+  smooth_page_indicator: ^1.2.1
+  supercharged: ^2.1.1
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/images/BombastikLogo.png
+    - assets/images/Bombastik_logo2.png
+    - assets/images/BombastikLogoRecortadoRedi.png
+    - assets/images/miss_carrito_sinfondo.png
+    - assets/images/hombre_cargandobolsas.png
+    - assets/images/BackgroundBombastik.png
+    - assets/images/BombastikBlancoSinFondoSized.png
+    - assets/images/icon_cliente_resized.png
+    - assets/images/icon_comercio.png
+    - assets/images/google_icon.png
+    - assets/images/background_image_login.png
+    - assets/images/onboarding1_bombastik_removedbg.png
+    - assets/images/BombastikLogoDarkMode.png
+    - assets/images/background_image_loginDarkMode.png
+  uses-material-design: true
+  #fonts:
+  # - family: Inter
+  #  fonts:
+  #   - asset: assets/fonts/Inter_28pt-Black.tff
+  #  - asset: assets/fonts/Inter_28pt-BlackItalic.tff
+  # - asset: assets/fonts/Inter_28pt-Bold.tff
+  #- asset: assets/fonts/Inter_28pt-BoldItalic.tff
+  #- asset: assets/fonts/Inter_28pt-ExtraBoldItalic.tff
+  #- asset: assets/fonts/Inter_28pt-ExtraLight.tff
+  #- asset: assets/fonts/Inter_28pt-ExtraLightItalic.tff
+  #- asset: assets/fonts/Inter_28pt-Italic.tff
+  #- asset: assets/fonts/Inter_28pt-Medium.tff
+  #- asset: assets/fonts/Inter_28pt-MediumItalic.tff
+  #- asset: assets/fonts/Inter_28pt-Regular.tff
+  #- asset: assets/fonts/Inter_28pt-SemiBold.tff
+  #- asset: assets/fonts/Inter_28pt-Thin.tff
+  #- asset: assets/fonts/Inter_28pt-ThinItalic.tff
