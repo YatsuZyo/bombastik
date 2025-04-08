@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
@@ -8,7 +10,14 @@ class FirestoreService {
     required String id,
     required Map<String, dynamic> data,
   }) async {
-    await _firestore.collection(collection).doc(id).set(data);
+    try {
+      print('Guardando documento en colección $collection con id $id');
+      await _firestore.collection(collection).doc(id).set(data);
+      print('Documento guardado exitosamente');
+    } catch (e) {
+      print('Error al guardar documento: $e');
+      rethrow;
+    }
   }
 
   Future<DocumentSnapshot> getDocument(String collection, String id) {

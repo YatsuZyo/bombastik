@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -41,18 +43,31 @@ class AuthService {
       final User? user = userCredential.user;
       if (user == null) return null;
 
-      // Crear o actualizar el documento del usuario con todos los datos
-      await _firestore.collection('users').doc(user.uid).set({
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': user.displayName ?? googleUser.displayName,
-        'role': 'cliente',
-        'createdAt': FieldValue.serverTimestamp(),
-        // Agregar campos adicionales vacíos para que puedan ser editados después
-        'name': user.displayName ?? googleUser.displayName,
-        'phone': '',
-        'address': '',
-      }, SetOptions(merge: true));
+      // Verificar si el usuario ya existe en Firestore
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+
+      // Solo actualizar campos esenciales si es un nuevo usuario
+      if (!userDoc.exists) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': user.displayName ?? googleUser.displayName,
+          'name': user.displayName ?? googleUser.displayName,
+          'role': 'cliente',
+          'createdAt': FieldValue.serverTimestamp(),
+          // Campos editables inicializados como null en lugar de vacío
+          'phone': null,
+          'address': null,
+          'photoUrl': user.photoURL,
+        });
+      } else {
+        // Para usuarios existentes, solo actualizar campos que podrían cambiar
+        await _firestore.collection('users').doc(user.uid).update({
+          'email': user.email,
+          'displayName': user.displayName ?? googleUser.displayName,
+          'photoUrl': user.photoURL,
+        });
+      }
 
       return user;
     } catch (e) {
@@ -67,6 +82,10 @@ class AuthService {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
+  }
+
+  Future<void> deleteUser() async {
+    await _auth.currentUser?.delete();
   }
 
   // Método para verificar rol de usuario

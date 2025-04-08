@@ -139,24 +139,7 @@ class CustomBottomNavBar extends ConsumerWidget {
 
   void _handleNavigation(int index, GoRouter router, WidgetRef ref) {
     if (ref.read(dashboardIndexProvider) != index) {
-      ref.read(dashboardIndexProvider.notifier).state = index;
-      switch (index) {
-        case 0:
-          router.go('/chat');
-          break;
-        case 1:
-          router.go('/favorites');
-          break;
-        case 2:
-          router.go('/home');
-          break;
-        case 3:
-          router.go('/cart');
-          break;
-        case 4:
-          router.go('/profile');
-          break;
-      }
+      ref.read(dashboardIndexProvider.notifier).setIndex(index);
     }
   }
 }

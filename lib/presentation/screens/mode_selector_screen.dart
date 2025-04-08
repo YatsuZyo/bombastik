@@ -80,7 +80,7 @@ class ModeSelectorScreen extends ConsumerWidget {
                   description:
                       'Administra tu comercio y visualiza tu dashboard de órdenes.',
                   onTap: () {
-                    router.push('/commerce-signin');
+                    router.push('/commerce-login');
                   },
                 ),
               ],

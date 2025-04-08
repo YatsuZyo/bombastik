@@ -1,6 +1,7 @@
 // lib/infrastructure/routes/app_router.dart
 import 'package:bombastik/presentation/screens/client/cart/cart_screen.dart';
 import 'package:bombastik/presentation/screens/client/client_dashboard/home_screen.dart';
+import 'package:bombastik/presentation/screens/client/client_signin_screen.dart';
 import 'package:bombastik/presentation/screens/client/favorites/favorites_screen.dart';
 import 'package:bombastik/presentation/screens/client/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,11 @@ import 'package:bombastik/presentation/screens/client/client_login_screen.dart';
 import 'package:bombastik/presentation/screens/client/client_onboarding_start_screen.dart';
 import 'package:bombastik/presentation/screens/client/client_dashboard/client_dashboard_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/commerce_login.dart';
-import 'package:bombastik/presentation/screens/commerce/commerce_signin.dart';
+import 'package:bombastik/presentation/screens/commerce/commerce_signin_screen.dart';
 import 'package:bombastik/presentation/screens/mode_selector_screen.dart';
 import 'package:bombastik/presentation/screens/client/chat/chat_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/commerce_home_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/products/products_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -54,6 +57,15 @@ GoRouter appRouter(ref) {
             (context, state) => MaterialPage(
               key: state.pageKey,
               child: const ClientLoginScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/client-signin',
+        name: 'client-signin',
+        pageBuilder:
+            (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const ClientSignInScreen(),
             ),
       ),
       GoRoute(
@@ -131,6 +143,24 @@ GoRouter appRouter(ref) {
             (context, state) => MaterialPage(
               key: state.pageKey,
               child: const CommerceSignInScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/commerce-home',
+        name: 'commerce-home',
+        pageBuilder:
+            (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const CommerceHomeScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/commerce-products',
+        name: 'commerce-products',
+        pageBuilder:
+            (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const ProductsScreen(),
             ),
       ),
     ],

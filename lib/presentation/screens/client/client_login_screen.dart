@@ -332,7 +332,7 @@ class _ClientLoginScreenState extends ConsumerState<ClientLoginScreen> {
                       Center(
                         child: GestureDetector(
                           onTap: () {
-                            ref.read(appRouterProvider).push('/client-signup');
+                            ref.read(appRouterProvider).push('/client-signin');
                           },
                           child: RichText(
                             text: TextSpan(

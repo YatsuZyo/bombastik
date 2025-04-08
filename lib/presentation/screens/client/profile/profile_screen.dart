@@ -1,170 +1,185 @@
-// lib/presentation/screens/client/client_dashboard/profile_screen.dart
+// lib/presentation/screens/client/profile/profile_screen.dart
 // ignore_for_file: deprecated_member_use
 
 import 'package:bombastik/config/router/app_router.dart';
-import 'package:bombastik/presentation/providers/client-providers/profile/profile_provider.dart'
-    as main_provider;
-import 'package:bombastik/presentation/screens/client/components/dialogs/show_edit_profile_dialog.dart'
-    hide profileProvider;
+import 'package:bombastik/presentation/providers/client-providers/profile/profile_provider.dart';
+import 'package:bombastik/presentation/screens/client/components/dialogs/show_edit_profile_dialog.dart';
 import 'package:bombastik/presentation/screens/client/components/show_logout_confirmation.dart';
+import 'package:bombastik/presentation/screens/client/components/theme_switch.dart';
 import 'package:bombastik/presentation/screens/client/profile/profile_avatar.dart';
+import 'package:bombastik/presentation/screens/client/profile/profile_option_card.dart';
 import 'package:flutter/material.dart';
 import 'package:bombastik/domain/models/user_profile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(main_provider.profileProvider);
-    final theme = Theme.of(context);
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      appBar: AppBar(
-        title: AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 300),
-          style:
-              theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color:
-                    theme.brightness == Brightness.dark
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onPrimary,
-              ) ??
-              TextStyle(),
-          child: const Text('Mi Perfil'),
+class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  Widget _buildHeader(UserProfile profile, ThemeData theme, bool isDark) {
+    final headerTextColor = isDark ? theme.colorScheme.onSurface : theme.colorScheme.onPrimary;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? theme.colorScheme.surface : theme.colorScheme.primary,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        backgroundColor:
-            theme.brightness == Brightness.dark
-                ? theme.colorScheme.surface
-                : theme.colorScheme.primary,
-        actions: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            transform: Matrix4.identity()..scale(1.0),
-            child: PopupMenuButton<String>(
-              icon: Icon(
-                Icons.more_vert,
-                color:
-                    theme.brightness == Brightness.dark
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onPrimary,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(
+                height: 48,
+                child: Center(child: ThemeSwitch()),
               ),
-              position: PopupMenuPosition.under,
-              offset: const Offset(0, 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
-                  width: 1,
+              IconButton(
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: isDark ? theme.colorScheme.primary : headerTextColor,
                 ),
+                onPressed: () => _showComingSoonSnackbar(context, 'Configuración (próximamente)'),
               ),
-              elevation: 4,
-              itemBuilder:
-                  (context) => [
-                    _buildPopupMenuItem(
-                      icon: Icons.edit_rounded,
-                      title: 'Editar perfil',
-                      value: 'edit',
-                      theme: theme,
-                    ),
-
-                    PopupMenuItem<String>(
-                      height: 2,
-                      enabled: false,
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        indent: 12,
-                        endIndent: 12,
-                        color: theme.colorScheme.outline.withOpacity(0.1),
-                      ),
-                    ),
-                    _buildPopupMenuItem(
-                      icon: Icons.settings_rounded,
-                      title: 'Configuración',
-                      value: 'settings',
-                      theme: theme,
-                    ),
-                    _buildPopupMenuItem(
-                      icon: Icons.help_center_rounded,
-                      title: 'Ayuda',
-                      value: 'help',
-                      theme: theme,
-                    ),
-                    _buildPopupMenuItem(
-                      icon: Icons.info_outline_rounded,
-                      title: 'Sobre nosotros',
-                      value: 'about',
-                      theme: theme,
-                    ),
-                    PopupMenuItem<String>(
-                      height: 2,
-                      enabled: false,
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        indent: 12,
-                        endIndent: 12,
-                        color: theme.colorScheme.outline.withOpacity(0.1),
-                      ),
-                    ),
-                    _buildPopupMenuItem(
-                      icon: Icons.logout_rounded,
-                      title: 'Cerrar sesión',
-                      value: 'logout',
-                      theme: theme,
-                      isDestructive: true,
-                    ),
-                  ],
-              onSelected: (value) async {
-                await _handleMenuSelection(value, context, ref, profile, theme);
-              },
+            ],
+          ),
+          const SizedBox(height: 20),
+          ProfileAvatar(
+            imageUrl: profile.photoUrl,
+            radius: 50,
+            onImageSelected: (imageFile) async {
+              final notifier = ref.read(profileProvider.notifier);
+              await notifier.uploadImageWithConfirmation(
+                context: context,
+                imageFile: imageFile,
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Text(
+            profile.name ?? 'Usuario',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: headerTextColor,
+            ),
+          ),
+          Text(
+            'Cliente',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: headerTextColor.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => _showEditProfileWithTransition(context, ref, profile),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? theme.colorScheme.primary : headerTextColor,
+              foregroundColor: isDark ? headerTextColor : theme.colorScheme.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              'Editar Perfil',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildProfileHeader(context, theme, profile, ref),
-            const SizedBox(height: 24),
-            _buildProfileDetails(theme, profile),
+    );
+  }
+
+  Widget _buildOptionsGrid(ThemeData theme) {
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1,
+      ),
+      delegate: SliverChildListDelegate([
+        ProfileOptionCard(
+          icon: Icons.shopping_bag_outlined,
+          title: 'Mis Pedidos',
+          onTap: () => _showComingSoonSnackbar(context, 'Mis Pedidos (próximamente)'),
+        ),
+        ProfileOptionCard(
+          icon: Icons.favorite_border_rounded,
+          title: 'Favoritos',
+          onTap: () => ref.read(appRouterProvider).push('/favorites'),
+        ),
+        ProfileOptionCard(
+          icon: Icons.local_offer_outlined,
+          title: 'Ofertas',
+          onTap: () => _showComingSoonSnackbar(context, 'Ofertas (próximamente)'),
+        ),
+        ProfileOptionCard(
+          icon: Icons.wallet_outlined,
+          title: 'Métodos de Pago',
+          onTap: () => _showComingSoonSnackbar(context, 'Métodos de Pago (próximamente)'),
+        ),
+        ProfileOptionCard(
+          icon: Icons.location_on_outlined,
+          title: 'Direcciones',
+          onTap: () => _showComingSoonSnackbar(context, 'Direcciones (próximamente)'),
+        ),
+        ProfileOptionCard(
+          icon: Icons.logout_rounded,
+          title: 'Cerrar Sesión',
+          iconColor: Colors.red,
+          onTap: () => _handleLogout(context, ref, theme),
+        ),
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    
+    final profile = ref.watch(profileProvider);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.background,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: _buildHeader(profile, theme, isDark),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(24),
+              sliver: _buildOptionsGrid(theme),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<void> _handleMenuSelection(
-    String value,
-    BuildContext context,
-    WidgetRef ref,
-    UserProfile profile,
-    ThemeData theme,
-  ) async {
-    switch (value) {
-      case 'edit':
-        await _showEditProfileWithTransition(context, ref, profile);
-        break;
-      case 'settings':
-        _showComingSoonSnackbar(context, 'Configuración (próximamente)');
-        break;
-      case 'help':
-        _showComingSoonSnackbar(context, 'Centro de ayuda (próximamente)');
-        break;
-      case 'about':
-        _showComingSoonSnackbar(context, 'Sobre nosotros (próximamente)');
-        break;
-      case 'logout':
-        await _handleLogout(context, ref, theme);
-        break;
-    }
+  void _showComingSoonSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _showEditProfileWithTransition(
@@ -172,32 +187,27 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     UserProfile profile,
   ) async {
+    if (!mounted) return;
+    
     await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
         transitionDuration: const Duration(milliseconds: 300),
         reverseTransitionDuration: const Duration(milliseconds: 200),
-        pageBuilder:
-            (_, __, ___) => Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: const EdgeInsets.all(20),
-              child: ScaleTransition(
-                scale: CurvedAnimation(parent: __, curve: Curves.easeOutBack),
-                child: showEditProfileDialog(
-                  context: context,
-                  ref: ref,
-                  currentProfile: profile,
-                  isStandalone: true,
-                ),
-              ),
+        pageBuilder: (context, animation, secondaryAnimation) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+            child: showEditProfileDialog(
+              context: context,
+              ref: ref,
+              currentProfile: profile,
+              isStandalone: true,
             ),
+          ),
+        ),
       ),
-    );
-  }
-
-  void _showComingSoonSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 1)),
     );
   }
 
@@ -206,12 +216,22 @@ class ProfileScreen extends ConsumerWidget {
     WidgetRef ref,
     ThemeData theme,
   ) async {
+    if (!mounted) return;
+    
     final shouldLogOut = await showLogoutConfirmation(
       context: context,
       onLogout: () {
+        if (!mounted) return;
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sesión cerrada', style: theme.textTheme.bodyLarge),
+            content: Text(
+              'Sesión cerrada',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: 14,
+              ),
+            ),
             backgroundColor: theme.colorScheme.surface,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -223,175 +243,5 @@ class ProfileScreen extends ConsumerWidget {
       },
     );
     if (shouldLogOut) {}
-  }
-
-  Widget _buildProfileHeader(
-    BuildContext context,
-    ThemeData theme,
-    UserProfile profile,
-    WidgetRef ref,
-  ) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: Column(
-        children: [
-          Hero(
-            tag: 'profile-avatar',
-            child: ProfileAvatar(
-              imageUrl:
-                  '${profile.photoUrl}?t=${DateTime.now().millisecondsSinceEpoch}',
-              radius: 50,
-              onImageSelected: (imageFile) async {
-                final notifier = ref.read(
-                  main_provider.profileProvider.notifier,
-                );
-                final newUrl = await notifier.uploadImageWithConfirmation(
-                  context: context,
-                  imageFile: imageFile,
-                );
-                if (newUrl != null) {
-                  await ref
-                      .read(main_provider.profileProvider.notifier)
-                      .updateProfileData({'photoUrl': newUrl});
-                  // ignore: use_build_context_synchronously
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Foto de perfil actualizada')),
-                  );
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Text(
-              profile.name ?? 'Nombre no especificado',
-              key: ValueKey<String>(profile.name ?? ''),
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Text(
-              profile.email,
-              key: ValueKey<String>(profile.email),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileDetails(ThemeData theme, UserProfile profile) {
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 300),
-      opacity: 1.0,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: theme.colorScheme.surface,
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildDetailItem(
-                theme: theme,
-                icon: Icons.phone,
-                title: 'Teléfono',
-                value: profile.phone,
-              ),
-              Divider(
-                height: 24,
-                color: theme.colorScheme.onSurface.withOpacity(0.2),
-              ),
-              _buildDetailItem(
-                theme: theme,
-                icon: Icons.location_on,
-                title: 'Dirección',
-                value: profile.address,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailItem({
-    required ThemeData theme,
-    required IconData icon,
-    required String title,
-    required String? value,
-  }) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: theme.colorScheme.primary),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: theme.textTheme.labelSmall),
-                const SizedBox(height: 4),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: Text(
-                    value ?? 'No especificado',
-                    key: ValueKey<String>(value ?? 'null'),
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupMenuItem({
-    required IconData icon,
-    required String title,
-    required String value,
-    required ThemeData theme,
-    bool isDestructive = false,
-  }) {
-    final color =
-        isDestructive
-            ? Colors.red
-            : theme.colorScheme.onSurface.withOpacity(0.8);
-
-    return PopupMenuItem<String>(
-      value: value,
-      height: 40,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: color,
-                fontWeight: isDestructive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -12,6 +12,35 @@
 .swiftpm/
 migrate_working_dir/
 
+# Archivos generados por Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+linked_*.ds
+unlinked.ds
+unlinked_spec.ds
+
+# Android
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# iOS
+/ios/Flutter/app.flx
+/ios/Flutter/app.zip
+/ios/Flutter/flutter_assets/
+/ios/Flutter/Generated.xcconfig
+/ios/ServiceDefinitions.json
+/ios/Runner/GeneratedPluginRegistrant.*
+
+# Archivos de configuración sensible
+/android/key.properties
+ios/Runner/GoogleService-Info.plist
+/lib/firebase_options.dart
+
 # IntelliJ related
 *.iml
 *.ipr

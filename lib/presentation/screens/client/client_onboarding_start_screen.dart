@@ -119,7 +119,7 @@ class _OnboardingStartScreenState extends ConsumerState<OnboardingStartScreen> {
                         curve: Curves.ease,
                       );
                     } else {
-                      router.push('/client-login');
+                      router.push('/client-signin');
                     }
                   },
                   style: ElevatedButton.styleFrom(

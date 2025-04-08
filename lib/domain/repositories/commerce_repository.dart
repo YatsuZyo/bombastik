@@ -1,30 +1,25 @@
-// ignore_for_file: avoid_print
-
-import 'package:bombastik/domain/models/user_profile.dart';
+import 'package:bombastik/domain/models/commerce_profile.dart';
 import 'package:bombastik/infrastructure/services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserRepository {
+class CommerceRepository {
   final FirestoreService _firestoreService;
 
-  UserRepository(this._firestoreService);
+  CommerceRepository(this._firestoreService);
 
-  Future<void> createUser(UserProfile user) async {
+  Future<void> createCommerce(CommerceProfile commerce) async {
     try {
-      print('Intentando crear usuario en Firestore con uid: ${user.uid}');
       await _firestoreService.setDocument(
         collection: 'users',
-        id: user.uid!,
-        data: user.toMapForFirestore(),
+        id: commerce.uid!,
+        data: commerce.toMap(),
       );
-      print('Usuario creado exitosamente en Firestore');
     } catch (e) {
-      print('Error al crear usuario en Firestore: $e');
       rethrow;
     }
   }
 
-  Future<UserProfile?> getUser(String userId) async {
+  Future<CommerceProfile?> getCommerce(String userId) async {
     final doc = await _firestoreService.getDocument('users', userId);
     if (!doc.exists) return null;
 
@@ -32,22 +27,22 @@ class UserRepository {
     if (data is! Map<String, dynamic>) {
       throw FormatException('Document data is not a Map<String, dynamic>');
     }
-    return UserProfile.fromMap(data);
+    return CommerceProfile.fromMap(data);
   }
 
-  Future<void> updateUser(UserProfile user) async {
+  Future<void> updateCommerce(CommerceProfile commerce) async {
     await _firestoreService.setDocument(
       collection: 'users',
-      id: user.uid!,
-      data: user.toMapForFirestore(),
+      id: commerce.uid!,
+      data: commerce.toMap(),
     );
   }
 
-  Future<void> deactivateUser(String uid) async {
+  Future<void> deactivateCommerce(String uid) async {
     await _firestoreService.setDocument(
       collection: 'users',
       id: uid,
       data: {'isActive': false, 'deletedAt': FieldValue.serverTimestamp()},
     );
   }
-}
+} 
