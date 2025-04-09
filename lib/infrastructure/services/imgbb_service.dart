@@ -26,19 +26,17 @@ class ImgBBService {
   ///
   /// [apiKey] - API key de ImgBB
   /// [dioOptions] - Opciones de configuración para Dio (opcional)
-  ImgBBService({
-    required String apiKey,
-    BaseOptions? dioOptions,
-  }) : _apiKey = apiKey,
-       _dio = Dio(
-         dioOptions ??
-             BaseOptions(
-               baseUrl: _baseUrl,
-               connectTimeout: const Duration(seconds: 30),
-               receiveTimeout: const Duration(seconds: 30),
-               validateStatus: (status) => status != null && status < 500,
-             ),
-       );
+  ImgBBService({required String apiKey, BaseOptions? dioOptions})
+    : _apiKey = apiKey,
+      _dio = Dio(
+        dioOptions ??
+            BaseOptions(
+              baseUrl: _baseUrl,
+              connectTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 30),
+              validateStatus: (status) => status != null && status < 500,
+            ),
+      );
 
   /// Sube una imagen a ImgBB y retorna la URL de la imagen
   ///
@@ -154,5 +152,18 @@ class ImgBBService {
       default:
         return 'Error de conexión: ${e.message}';
     }
+  }
+
+  Future<String?> uploadPromotionImage(BuildContext context) async {
+    final image = await pickImage(
+      context,
+      maxWidth: 1200,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
+
+    if (image == null) return null;
+
+    return uploadImage(image);
   }
 }

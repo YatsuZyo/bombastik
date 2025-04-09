@@ -4,6 +4,7 @@ import 'package:bombastik/domain/models/product.dart';
 
 abstract class ProductRepository {
   Future<List<Product>> getProducts(String commerceId);
+  Stream<List<Product>> watchProducts(String commerceId);
   Future<Product?> getProduct(String productId);
   Future<void> createProduct(Product product);
   Future<void> updateProduct(Product product);
@@ -132,5 +133,18 @@ class ProductRepositoryImpl implements ProductRepository {
     } catch (e) {
       throw Exception('Error al obtener productos por categoría: $e');
     }
+  }
+
+  @override
+  Stream<List<Product>> watchProducts(String commerceId) {
+    return _firestore
+        .collection('commerces')
+        .doc(commerceId)
+        .collection('products')
+        .orderBy('name')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Product.fromMap({...doc.data(), 'id': doc.id}))
+            .toList());
   }
 } 

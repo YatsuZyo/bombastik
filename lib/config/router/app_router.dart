@@ -17,6 +17,8 @@ import 'package:bombastik/presentation/screens/mode_selector_screen.dart';
 import 'package:bombastik/presentation/screens/client/chat/chat_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/commerce_home_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/products/products_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/orders/orders_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/promotions/promotions_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -161,6 +163,24 @@ GoRouter appRouter(ref) {
             (context, state) => MaterialPage(
               key: state.pageKey,
               child: const ProductsScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/commerce-orders',
+        name: 'commerce-orders',
+        pageBuilder:
+            (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const OrdersScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/commerce-promotions',
+        name: 'commerce-promotions',
+        pageBuilder:
+            (context, state) => MaterialPage(
+              key: state.pageKey,
+              child: const PromotionsScreen(),
             ),
       ),
     ],

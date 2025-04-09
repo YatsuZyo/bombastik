@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
   final IconData? prefixIcon;
+  final Widget? suffixIcon;
   final int? maxLines;
   final bool readOnly;
   final bool obscureText;
@@ -19,6 +20,7 @@ class CustomTextField extends StatelessWidget {
     required this.label,
     required this.hint,
     this.prefixIcon,
+    this.suffixIcon,
     this.maxLines = 1,
     this.readOnly = false,
     this.obscureText = false,
@@ -45,6 +47,7 @@ class CustomTextField extends StatelessWidget {
         labelText: label,
         hintText: hint,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: theme.colorScheme.outline),

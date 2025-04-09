@@ -59,7 +59,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? theme.colorScheme.surface : theme.colorScheme.primary,
+        color: theme.colorScheme.primary,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
@@ -86,7 +86,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color:
                           isDark
-                              ? theme.colorScheme.onSurface
+                              ? theme.colorScheme.onBackground
                               : theme.colorScheme.onPrimary,
                     ),
                   ),
@@ -96,7 +96,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     style: theme.textTheme.titleMedium?.copyWith(
                       color:
                           isDark
-                              ? theme.colorScheme.onSurface.withOpacity(0.7)
+                              ? theme.colorScheme.onBackground
                               : theme.colorScheme.onPrimary.withOpacity(0.7),
                     ),
                   ),
@@ -107,7 +107,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   Icons.notifications_outlined,
                   color:
                       isDark
-                          ? theme.colorScheme.primary
+                          ? theme.colorScheme.onBackground
                           : theme.colorScheme.onPrimary,
                 ),
                 onPressed: _showNotificationsDialog,
@@ -186,12 +186,6 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
           children: [
             _buildQuickActionCard(
               context,
-              icon: Icons.add_circle_outline,
-              title: 'Nuevo Producto',
-              onTap: () => router.push('/commerce-products'),
-            ),
-            _buildQuickActionCard(
-              context,
               icon: Icons.inventory_2_outlined,
               title: 'Gestionar Productos',
               onTap: () => router.push('/commerce-products'),
@@ -200,11 +194,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
               context,
               icon: Icons.shopping_cart_outlined,
               title: 'Pedidos',
-              onTap:
-                  () => _showComingSoonSnackbar(
-                    context,
-                    'Pedidos (próximamente)',
-                  ),
+              onTap: () => router.push("/commerce-orders"),
             ),
             _buildQuickActionCard(
               context,
@@ -319,9 +309,21 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Dashboard'),
+          automaticallyImplyLeading: false,
+          backgroundColor: theme.colorScheme.primary,
+          titleTextStyle: theme.textTheme.headlineMedium?.copyWith(
+            color:
+                isDark
+                    ? theme.colorScheme.onBackground
+                    : theme.colorScheme.onPrimary,
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
+              color:
+                  isDark
+                      ? theme.colorScheme.onBackground
+                      : theme.colorScheme.onPrimary,
               onPressed: () async {
                 final shouldLogout = await showLogoutConfirmationDialog(
                   context,
@@ -329,7 +331,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                 if (shouldLogout == true && context.mounted) {
                   await FirebaseAuth.instance.signOut();
                   if (context.mounted) {
-                    context.go('/');
+                    context.go('/commerce-login');
                   }
                 }
               },

@@ -1,10 +1,11 @@
+import 'package:bombastik/presentation/providers/commerce-providers/products/products_provider.dart';
 import 'package:bombastik/presentation/screens/commerce/products/product_form_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bombastik/domain/models/product.dart';
-import 'package:bombastik/domain/use_cases/product_controller.dart';
 import 'package:bombastik/presentation/widgets/custom_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bombastik/presentation/screens/commerce/promotions/promotions_screen.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -20,10 +21,12 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      ref.read(productControllerProvider.notifier).setCommerceId(user.uid);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null && mounted) {
+        ref.read(currentCommerceIdProvider.notifier).state = user.uid;
+      }
+    });
   }
 
   @override
@@ -35,14 +38,28 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final productsState = ref.watch(productControllerProvider);
+    final productsAsync = ref.watch(productsStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis Productos'),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         actions: [
           IconButton(
+            icon: const Icon(Icons.local_offer),
+            tooltip: 'Promociones',
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PromotionsScreen(),
+                  ),
+                ),
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
+            tooltip: 'Agregar producto',
             onPressed: () => _showAddProductDialog(context),
           ),
         ],
@@ -85,7 +102,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             ),
           ),
           Expanded(
-            child: productsState.when(
+            child: productsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error:
                   (error, stackTrace) => Center(child: Text('Error: $error')),
@@ -96,10 +113,18 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   );
                 }
 
+                // Filtrar por categoría si está seleccionada
+                final filteredProducts =
+                    _selectedCategory != null
+                        ? products
+                            .where((p) => p.category == _selectedCategory)
+                            .toList()
+                        : products;
+
                 return ListView.builder(
-                  itemCount: products.length,
+                  itemCount: filteredProducts.length,
                   itemBuilder: (context, index) {
-                    final product = products[index];
+                    final product = filteredProducts[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -118,7 +143,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                                 ),
                         title: Text(product.name),
                         subtitle: Text(
-                          '${product.price.toStringAsFixed(2)} Bs. - Stock: ${product.stock}',
+                          '${product.price.toStringAsFixed(2)}\$ - Stock: ${product.stock}',
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -180,7 +205,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               TextButton(
                 onPressed: () {
                   ref
-                      .read(productControllerProvider.notifier)
+                      .read(productRepositoryProvider)
                       .deleteProduct(product.id!);
                   Navigator.pop(context);
                 },
