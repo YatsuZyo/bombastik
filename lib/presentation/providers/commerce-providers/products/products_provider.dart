@@ -20,13 +20,16 @@ final imgBBServiceProvider = Provider<ImgBBService>((ref) {
   );
 });
 
-final productsProvider =
-    StateNotifierProvider<ProductsNotifier, AsyncValue<List<Product>>>((ref) {
-      return ProductsNotifier(
-        ref.read(productRepositoryProvider),
-        ref.read(imgBBServiceProvider),
-      );
-    });
+final currentCommerceIdProvider = StateProvider<String?>((ref) => null);
+
+final productsStreamProvider = StreamProvider.autoDispose<List<Product>>((ref) {
+  final repository = ref.watch(productRepositoryProvider);
+  final commerceId = ref.watch(currentCommerceIdProvider);
+  
+  if (commerceId == null) return Stream.value([]);
+  
+  return repository.watchProducts(commerceId);
+});
 
 class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
   final ProductRepository _repository;
@@ -34,23 +37,10 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
   String? _currentCommerceId;
 
   ProductsNotifier(this._repository, this._imgBBService)
-    : super(const AsyncValue.loading());
+      : super(const AsyncValue.loading());
 
   void setCommerceId(String commerceId) {
     _currentCommerceId = commerceId;
-    loadProducts();
-  }
-
-  Future<void> loadProducts() async {
-    if (_currentCommerceId == null) return;
-
-    try {
-      state = const AsyncValue.loading();
-      final products = await _repository.getProducts(_currentCommerceId!);
-      state = AsyncValue.data(products);
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
-    }
   }
 
   Future<void> createProduct(
@@ -72,9 +62,6 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
       );
       await _repository.createProduct(newProduct);
 
-      // 3. Recargar productos
-      await loadProducts();
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Producto creado exitosamente')),
@@ -82,9 +69,9 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al crear producto: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al crear producto: $e')),
+        );
       }
     }
   }
@@ -108,9 +95,6 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
 
       await _repository.updateProduct(updatedProduct);
 
-      // 3. Recargar productos
-      await loadProducts();
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Producto actualizado exitosamente')),
@@ -127,14 +111,7 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
 
   Future<void> deleteProduct(String productId, BuildContext context) async {
     try {
-      state = const AsyncValue.loading();
       await _repository.deleteProduct(productId);
-      
-      // Actualizar el estado después de eliminar
-      if (_currentCommerceId != null) {
-        final products = await _repository.getProducts(_currentCommerceId!);
-        state = AsyncValue.data(products);
-      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +119,6 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Product>>> {
         );
       }
     } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al eliminar producto: $e')),

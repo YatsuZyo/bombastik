@@ -1,4 +1,5 @@
 import 'package:bombastik/presentation/providers/commerce-providers/products/products_provider.dart';
+import 'package:bombastik/presentation/providers/products_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bombastik/domain/models/product.dart';

@@ -23,6 +23,7 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
   final _passwordController = TextEditingController();
   bool _isRifLogin = true;
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -146,6 +147,7 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                         keyboardType: _isRifLogin
                             ? TextInputType.number
                             : TextInputType.emailAddress,
+                        prefixIcon: _isRifLogin ? Icons.badge : Icons.email,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return _isRifLogin
@@ -163,7 +165,19 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                         controller: _passwordController,
                         label: 'Contraseña',
                         hint: 'Ingresa tu contraseña',
-                        obscureText: true,
+                        obscureText: _obscurePassword,
+                        prefixIcon: Icons.lock,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            color: theme.colorScheme.primary,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingresa tu contraseña';
