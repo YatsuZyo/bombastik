@@ -14,34 +14,68 @@ class AppColors {
   static const lightTertiary = Color(0xFFFFD54F);
   static const lightBackground = Color(0xFFFFFFFF);
   static const lightSurface = Color(0xFFF5F5F5);
+  
+  // Gradientes para estadísticas (Verde)
+  static const statsGradientStart = Color(0xFF87CF45);
+  static const statsGradientEnd = Color(0xFF42B883);
+  
+  // Gradientes para acciones rápidas y contenido
+  static const productsGradientStart = Color(0xFF87CF45);
+  static const productsGradientEnd = Color(0xFF42B883);
+  
+  static const ordersGradientStart = Color(0xFF4158D0);
+  static const ordersGradientEnd = Color(0xFFC850C0);
+  
+  static const analyticsGradientStart = Color(0xFF43E97B);
+  static const analyticsGradientEnd = Color(0xFF38F9D7);
+
+  // Gradientes para promociones
+  static const promotionsGradientStart = Color(0xFFFF8A00);  // Naranja brillante
+  static const promotionsGradientEnd = Color(0xFFFF0000);    // Rojo brillante
+  
+  // Colores para el contenido de las tarjetas
+  static const lightCardIcon = Color(0xFFFFFFFF);
+  static const lightCardTitle = Color(0xFFFFFFFF);
+  static const lightCardText = Color(0xFFFFF3E0);
+  
   static const lightError = Color(0xFFE57373);
   static const lightOnPrimary = Color(0xFFFFFFFF);
   static const lightOnBackground = Color(0xFF212121);
   static const lightOnSurface = Color(0xFF424242);
 
   // Dark Mode
-  /*static const darkPrimary = Color(0xFF86C144);
+  static const darkPrimary = Color(0xFF86C144);
   static const darkPrimaryVariant = Color(0xFFA5D66E);
   static const darkSecondary = Color(0xFF4DB6AC);
   static const darkTertiary = Color(0xFFFFD54F);
-  static const darkBackground = Color(0xFF121212);
-  static const darkSurface = Color(0xFF1E1E1E);
-  static const darkError = Color(0xFFEF5350);
-  static const darkOnPrimary = Color(0xFF000000);
-  static const darkOnBackground = Color(0xFFFFFFFF);
-  static const darkOnSurface = Color(0xFFE0E0E0);*/
-
-  static const darkPrimary = Color(0xFF86C144); // Verde se mantiene
-  static const darkPrimaryVariant = Color(0xFFA5D66E);
-  static const darkSecondary = Color(0xFF4DB6AC);
-  static const darkTertiary = Color(0xFFFFD54F);
-  static const darkBackground = Color(0xFF1A2A3A); // Azul oscuro profundo
-  static const darkSurface = Color(0xFF243B53); // Azul oscuro más claro
+  static const darkBackground = Color(0xFF1A2A3A);
+  static const darkSurface = Color(0xFF243B53);
+  
+  // Gradientes para modo oscuro
+  static const statsGradientDarkStart = Color(0xFF42B883);
+  static const statsGradientDarkEnd = Color(0xFF347474);
+  
+  static const productsDarkGradientStart = Color(0xFF42B883);
+  static const productsDarkGradientEnd = Color(0xFF347474);
+  
+  static const promotionsDarkGradientStart = Color(0xFFFF6B00);  // Naranja más oscuro
+  static const promotionsDarkGradientEnd = Color(0xFFCC0000);    // Rojo más oscuro
+  
+  // Colores para el contenido de las tarjetas en modo oscuro
+  static const darkCardIcon = Color(0xFFFFFFFF);
+  static const darkCardTitle = Color(0xFFFFFFFF);
+  static const darkCardText = Color(0xFFE0E0E0);
+  
   static const darkError = Color(0xFFEF5350);
   static const darkOnPrimary = Color(0xFF000000);
   static const darkOnBackground = Color(0xFFFFFFFF);
   static const darkOnSurface = Color(0xFFE0E0E0);
-  static const darkOutline = Color(0xFF3D5A78); // Borde azul intermedio
+  static const darkOutline = Color(0xFF3D5A78);
+
+  // Promotion Card Colors
+  static const promotionCardTitle = Colors.white;
+  static const promotionCardText = Color(0xFFFFF3E0);
+  static const promotionCardIcon = Colors.white;
 }
 
 class AppTheme {
@@ -59,6 +93,30 @@ class AppTheme {
       onBackground: AppColors.lightOnBackground,
       onSurface: AppColors.lightOnSurface,
       outline: AppColors.darkOutline,
+    ),
+    cardTheme: CardTheme(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.lightTertiary.withOpacity(0.3)),
+      ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      textStyle: GoogleFonts.inter(
+        color: AppColors.lightOnBackground,
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.white),
+        elevation: MaterialStateProperty.all(8),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: AppColors.lightTertiary.withOpacity(0.3),
+            ),
+          ),
+        ),
+      ),
     ),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.poppins(
@@ -115,6 +173,7 @@ class AppTheme {
     useMaterial3: true,
     colorScheme: const ColorScheme.dark(
       primary: AppColors.darkPrimary,
+      primaryContainer: AppColors.darkPrimaryVariant,
       secondary: AppColors.darkSecondary,
       tertiary: AppColors.darkTertiary,
       background: AppColors.darkBackground,
@@ -123,6 +182,31 @@ class AppTheme {
       onPrimary: AppColors.darkOnPrimary,
       onBackground: AppColors.darkOnBackground,
       onSurface: AppColors.darkOnSurface,
+      outline: AppColors.darkOutline,
+    ),
+    cardTheme: CardTheme(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.darkTertiary.withOpacity(0.3)),
+      ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      textStyle: GoogleFonts.inter(
+        color: AppColors.darkOnBackground,
+      ),
+      menuStyle: MenuStyle(
+        backgroundColor: MaterialStateProperty.all(AppColors.darkBackground),
+        elevation: MaterialStateProperty.all(8),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: AppColors.darkOutline.withOpacity(0.3),
+            ),
+          ),
+        ),
+      ),
     ),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.poppins(
@@ -165,14 +249,6 @@ class AppTheme {
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: AppColors.darkBackground,
         systemNavigationBarIconBrightness: Brightness.light,
-      ),
-    ),
-    cardTheme: CardTheme(
-      color: AppColors.darkSurface,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.darkOutline.withOpacity(0.3)),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

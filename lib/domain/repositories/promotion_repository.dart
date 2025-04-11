@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bombastik/domain/models/promotion.dart';
+import 'package:flutter/foundation.dart';
 
 abstract class PromotionRepository {
   Stream<List<Promotion>> watchPromotions(String commerceId);
@@ -11,6 +12,8 @@ abstract class PromotionRepository {
   Future<void> deletePromotion(String promotionId);
   Future<void> updatePromotionStatus(String promotionId, PromotionStatus status);
   Future<void> incrementUsedCount(String promotionId);
+  Future<bool> canUsePromotion(String promotionId, String customerId);
+  Future<void> markPromotionAsUsed(String promotionId, String customerId);
 }
 
 class PromotionRepositoryImpl implements PromotionRepository {
@@ -25,15 +28,49 @@ class PromotionRepositoryImpl implements PromotionRepository {
 
   @override
   Stream<List<Promotion>> watchPromotions(String commerceId) {
+    debugPrint('Obteniendo promociones para commerceId: $commerceId');
     return _firestore
         .collection('commerces')
         .doc(commerceId)
         .collection('promotions')
         .orderBy('startDate', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Promotion.fromMap({...doc.data(), 'id': doc.id}))
-            .toList());
+        .map((snapshot) {
+          debugPrint('Número de promociones encontradas: ${snapshot.docs.length}');
+          final promotions = <Promotion>[];
+          
+          for (var doc in snapshot.docs) {
+            try {
+              final data = doc.data();
+              debugPrint('Datos de la promoción: $data');
+              
+              // Asegurarse de que los datos necesarios estén presentes
+              if (data['title'] == null || 
+                  data['description'] == null || 
+                  data['type'] == null || 
+                  data['status'] == null || 
+                  data['value'] == null || 
+                  data['startDate'] == null || 
+                  data['endDate'] == null) {
+                debugPrint('Promoción con datos incompletos: ${doc.id}');
+                continue;
+              }
+
+              final promotion = Promotion.fromMap({
+                ...data,
+                'id': doc.id,
+                'commerceId': commerceId,
+              });
+              promotions.add(promotion);
+            } catch (e) {
+              debugPrint('Error al convertir promoción ${doc.id}: $e');
+              continue;
+            }
+          }
+          
+          debugPrint('Promociones convertidas exitosamente: ${promotions.length}');
+          return promotions;
+        });
   }
 
   @override
@@ -111,12 +148,9 @@ class PromotionRepositoryImpl implements PromotionRepository {
       final user = _auth.currentUser;
       if (user == null) throw Exception('Usuario no autenticado');
 
-      final promotion = await getPromotion(promotionId);
-      if (promotion == null) throw Exception('Promoción no encontrada');
-
       await _firestore
           .collection('commerces')
-          .doc(promotion.commerceId)
+          .doc(user.uid)
           .collection('promotions')
           .doc(promotionId)
           .delete();
@@ -161,6 +195,63 @@ class PromotionRepositoryImpl implements PromotionRepository {
       });
     } catch (e) {
       throw Exception('Error al incrementar el contador de uso: $e');
+    }
+  }
+
+  @override
+  Future<bool> canUsePromotion(String promotionId, String customerId) async {
+    try {
+      final promotion = await getPromotion(promotionId);
+      if (promotion == null) return false;
+
+      // Verificar si la promoción está activa
+      if (promotion.status != PromotionStatus.active) return false;
+
+      // Verificar fechas
+      final now = DateTime.now();
+      if (now.isBefore(promotion.startDate) || now.isAfter(promotion.endDate)) {
+        return false;
+      }
+
+      // Verificar límite de usos totales
+      if (promotion.maxUses != null && 
+          (promotion.usedCount ?? 0) >= promotion.maxUses!) {
+        return false;
+      }
+
+      // Verificar si el cliente ya usó la promoción
+      if (promotion.usedByCustomers?[customerId] == true) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      throw Exception('Error al verificar uso de promoción: $e');
+    }
+  }
+
+  @override
+  Future<void> markPromotionAsUsed(String promotionId, String customerId) async {
+    try {
+      final promotion = await getPromotion(promotionId);
+      if (promotion == null) throw Exception('Promoción no encontrada');
+
+      // Actualizar el mapa de clientes que han usado la promoción
+      final updatedUsedByCustomers = Map<String, bool>.from(
+        promotion.usedByCustomers ?? {},
+      )..[customerId] = true;
+
+      await _firestore
+          .collection('commerces')
+          .doc(promotion.commerceId)
+          .collection('promotions')
+          .doc(promotionId)
+          .update({
+        'usedByCustomers': updatedUsedByCustomers,
+        'usedCount': FieldValue.increment(1),
+      });
+    } catch (e) {
+      throw Exception('Error al marcar promoción como usada: $e');
     }
   }
 } 

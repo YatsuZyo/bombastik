@@ -1,13 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bombastik/infrastructure/services/auth_service.dart';
 import 'package:bombastik/domain/use_cases/commerce_login.dart';
 import 'package:bombastik/presentation/widgets/custom_text_field.dart';
-import 'package:bombastik/config/themes/app_theme.dart';
 import 'package:bombastik/config/router/app_router.dart';
+import 'package:flutter/services.dart';
 
 class CommerceLoginScreen extends ConsumerStatefulWidget {
   const CommerceLoginScreen({super.key});
@@ -47,9 +45,9 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) {
@@ -83,9 +81,10 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                 width: MediaQuery.of(context).size.width * 0.9,
                 constraints: const BoxConstraints(maxWidth: 500),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? theme.colorScheme.surface.withOpacity(0.95)
-                      : Colors.white.withOpacity(0.94),
+                  color:
+                      isDark
+                          ? theme.colorScheme.surface.withOpacity(0.95)
+                          : Colors.white.withOpacity(0.94),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 padding: const EdgeInsets.all(24),
@@ -143,18 +142,34 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                       CustomTextField(
                         controller: _identifierController,
                         label: _isRifLogin ? 'RIF' : 'Email',
-                        hint: _isRifLogin ? 'Ingresa tu RIF' : 'Ingresa tu email',
-                        keyboardType: _isRifLogin
-                            ? TextInputType.number
-                            : TextInputType.emailAddress,
+                        hint:
+                            _isRifLogin ? 'Ingresa tu RIF' : 'Ingresa tu email',
+                        keyboardType:
+                            _isRifLogin
+                                ? TextInputType.number
+                                : TextInputType.emailAddress,
                         prefixIcon: _isRifLogin ? Icons.badge : Icons.email,
+                        prefixText: _isRifLogin ? 'J' : null,
+                        inputFormatters:
+                            _isRifLogin
+                                ? [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9]'),
+                                  ),
+                                  LengthLimitingTextInputFormatter(9),
+                                ]
+                                : null,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return _isRifLogin
                                 ? 'Por favor ingresa tu RIF'
                                 : 'Por favor ingresa tu email';
                           }
-                          if (!_isRifLogin && !value.contains('@')) {
+                          if (_isRifLogin) {
+                            if (value.length != 9) {
+                              return 'El RIF debe tener 9 números';
+                            }
+                          } else if (!value.contains('@')) {
                             return 'Por favor ingresa un email válido';
                           }
                           return null;
@@ -169,7 +184,9 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                         prefixIcon: Icons.lock,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: theme.colorScheme.primary,
                           ),
                           onPressed: () {
@@ -199,22 +216,23 @@ class _CommerceLoginScreenState extends ConsumerState<CommerceLoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator()
-                              : const Text('Iniciar Sesión'),
+                          child:
+                              _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : const Text('Iniciar Sesión'),
                         ),
                       ),
                       const SizedBox(height: 16),
                       Center(
                         child: TextButton(
                           onPressed: () {
-                            ref.read(appRouterProvider).push('/commerce-signin');
+                            ref
+                                .read(appRouterProvider)
+                                .push('/commerce-signin');
                           },
                           child: Text(
                             '¿No tienes una cuenta? Regístrate aquí',
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                            ),
+                            style: TextStyle(color: theme.colorScheme.primary),
                           ),
                         ),
                       ),
