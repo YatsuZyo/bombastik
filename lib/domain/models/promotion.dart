@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 enum PromotionType {
   percentage,    // Descuento porcentual
@@ -25,14 +26,15 @@ class Promotion {
   final DateTime startDate;
   final DateTime endDate;
   final List<String> productIds; // IDs de productos aplicables
-  final int? minQuantity;   // Cantidad mínima de productos
-  final int? maxUses;       // Máximo de usos permitidos
-  final int usedCount;      // Veces que se ha usado
+  final String? categoryId;  // Nueva propiedad para categoría
   final double? minPurchaseAmount; // Monto mínimo de compra
+  final int? maxUses;       // Máximo de usos permitidos
+  final int? usedCount;     // Veces que se ha usado
   final String? imageUrl;   // Imagen promocional
-  final Map<String, dynamic>? conditions; // Condiciones adicionales
+  final String? code;  // Nueva propiedad para código promocional
+  final Map<String, bool>? usedByCustomers;  // Nueva propiedad para rastrear uso por cliente
 
-  Promotion({
+  const Promotion({
     this.id,
     required this.commerceId,
     required this.title,
@@ -43,61 +45,14 @@ class Promotion {
     required this.startDate,
     required this.endDate,
     required this.productIds,
-    this.minQuantity,
-    this.maxUses,
-    this.usedCount = 0,
+    this.categoryId,  // Opcional: puede ser por categoría o por productos
     this.minPurchaseAmount,
+    this.maxUses,
+    this.usedCount,
     this.imageUrl,
-    this.conditions,
+    this.code,
+    this.usedByCustomers,
   });
-
-  factory Promotion.fromMap(Map<String, dynamic> map) {
-    return Promotion(
-      id: map['id'] as String?,
-      commerceId: map['commerceId'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String,
-      type: PromotionType.values.firstWhere(
-        (e) => e.toString() == 'PromotionType.${map['type']}',
-      ),
-      status: PromotionStatus.values.firstWhere(
-        (e) => e.toString() == 'PromotionStatus.${map['status']}',
-      ),
-      value: (map['value'] as num).toDouble(),
-      startDate: (map['startDate'] as Timestamp).toDate(),
-      endDate: (map['endDate'] as Timestamp).toDate(),
-      productIds: List<String>.from(map['productIds'] as List),
-      minQuantity: map['minQuantity'] as int?,
-      maxUses: map['maxUses'] as int?,
-      usedCount: map['usedCount'] as int? ?? 0,
-      minPurchaseAmount: map['minPurchaseAmount'] != null 
-        ? (map['minPurchaseAmount'] as num).toDouble()
-        : null,
-      imageUrl: map['imageUrl'] as String?,
-      conditions: map['conditions'] as Map<String, dynamic>?,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'commerceId': commerceId,
-      'title': title,
-      'description': description,
-      'type': type.toString().split('.').last,
-      'status': status.toString().split('.').last,
-      'value': value,
-      'startDate': Timestamp.fromDate(startDate),
-      'endDate': Timestamp.fromDate(endDate),
-      'productIds': productIds,
-      'minQuantity': minQuantity,
-      'maxUses': maxUses,
-      'usedCount': usedCount,
-      'minPurchaseAmount': minPurchaseAmount,
-      'imageUrl': imageUrl,
-      'conditions': conditions,
-    };
-  }
 
   Promotion copyWith({
     String? id,
@@ -110,12 +65,13 @@ class Promotion {
     DateTime? startDate,
     DateTime? endDate,
     List<String>? productIds,
-    int? minQuantity,
+    String? categoryId,
+    double? minPurchaseAmount,
     int? maxUses,
     int? usedCount,
-    double? minPurchaseAmount,
     String? imageUrl,
-    Map<String, dynamic>? conditions,
+    String? code,
+    Map<String, bool>? usedByCustomers,
   }) {
     return Promotion(
       id: id ?? this.id,
@@ -128,12 +84,121 @@ class Promotion {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       productIds: productIds ?? this.productIds,
-      minQuantity: minQuantity ?? this.minQuantity,
+      categoryId: categoryId ?? this.categoryId,
+      minPurchaseAmount: minPurchaseAmount ?? this.minPurchaseAmount,
       maxUses: maxUses ?? this.maxUses,
       usedCount: usedCount ?? this.usedCount,
-      minPurchaseAmount: minPurchaseAmount ?? this.minPurchaseAmount,
       imageUrl: imageUrl ?? this.imageUrl,
-      conditions: conditions ?? this.conditions,
+      code: code ?? this.code,
+      usedByCustomers: usedByCustomers ?? this.usedByCustomers,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'commerceId': commerceId,
+      'title': title,
+      'description': description,
+      'type': type.toString(),
+      'status': status.toString(),
+      'value': value,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'productIds': productIds,
+      'categoryId': categoryId,
+      'minPurchaseAmount': minPurchaseAmount,
+      'maxUses': maxUses,
+      'usedCount': usedCount ?? 0,
+      'imageUrl': imageUrl,
+      'code': code,
+      'usedByCustomers': usedByCustomers ?? {},
+    };
+  }
+
+  factory Promotion.fromMap(Map<String, dynamic> map) {
+    try {
+      debugPrint('Convirtiendo mapa a Promotion: $map');
+      
+      // Validar campos requeridos
+      if (map['title'] == null || 
+          map['description'] == null || 
+          map['type'] == null || 
+          map['status'] == null || 
+          map['value'] == null || 
+          map['startDate'] == null || 
+          map['endDate'] == null) {
+        throw Exception('Campos requeridos faltantes en la promoción');
+      }
+
+      // Convertir tipo y estado
+      final typeString = map['type'].toString();
+      final statusString = map['status'].toString();
+      
+      final type = PromotionType.values.firstWhere(
+        (e) => e.toString() == typeString,
+        orElse: () => PromotionType.percentage,
+      );
+      
+      final status = PromotionStatus.values.firstWhere(
+        (e) => e.toString() == statusString,
+        orElse: () => PromotionStatus.active,
+      );
+
+      // Convertir fechas
+      DateTime startDate;
+      DateTime endDate;
+      try {
+        startDate = DateTime.parse(map['startDate']);
+        endDate = DateTime.parse(map['endDate']);
+      } catch (e) {
+        debugPrint('Error al parsear fechas: $e');
+        startDate = DateTime.now();
+        endDate = DateTime.now().add(const Duration(days: 7));
+      }
+
+      // Convertir lista de productos
+      List<String> productIds;
+      try {
+        productIds = List<String>.from(map['productIds'] ?? []);
+      } catch (e) {
+        debugPrint('Error al convertir productIds: $e');
+        productIds = [];
+      }
+
+      // Convertir mapa de clientes
+      Map<String, bool>? usedByCustomers;
+      try {
+        usedByCustomers = map['usedByCustomers'] != null 
+            ? Map<String, bool>.from(map['usedByCustomers'])
+            : null;
+      } catch (e) {
+        debugPrint('Error al convertir usedByCustomers: $e');
+        usedByCustomers = null;
+      }
+
+      return Promotion(
+        id: map['id'],
+        commerceId: map['commerceId'],
+        title: map['title'],
+        description: map['description'],
+        type: type,
+        status: status,
+        value: (map['value'] as num).toDouble(),
+        startDate: startDate,
+        endDate: endDate,
+        productIds: productIds,
+        categoryId: map['categoryId'],
+        minPurchaseAmount: map['minPurchaseAmount']?.toDouble(),
+        maxUses: map['maxUses']?.toInt(),
+        usedCount: map['usedCount']?.toInt() ?? 0,
+        imageUrl: map['imageUrl'],
+        code: map['code'],
+        usedByCustomers: usedByCustomers,
+      );
+    } catch (e) {
+      debugPrint('Error al convertir mapa a Promotion: $e');
+      rethrow;
+    }
   }
 } 

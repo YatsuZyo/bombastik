@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:bombastik/config/router/app_router.dart';
+import 'package:bombastik/domain/use_cases/commerce_login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bombastik/config/themes/app_theme.dart';
@@ -9,6 +10,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bombastik/presentation/screens/commerce/components/show_logout_confirmation.dart';
+import 'package:flutter/services.dart';
+import 'package:bombastik/presentation/widgets/gradient_card.dart';
+import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
+import 'package:bombastik/presentation/widgets/gradient_bottom_bar.dart';
+import 'package:bombastik/presentation/providers/commerce_providers/auth/commerce_auth_provider.dart';
 
 class CommerceHomeScreen extends ConsumerStatefulWidget {
   const CommerceHomeScreen({super.key});
@@ -21,6 +27,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   final _searchController = TextEditingController();
   final bool _isLoading = false;
   String? _companyName;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -59,7 +66,17 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors:
+              isDark
+                  ? [
+                    AppColors.statsGradientDarkStart,
+                    AppColors.statsGradientDarkEnd,
+                  ]
+                  : [AppColors.statsGradientStart, AppColors.statsGradientEnd],
+        ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
@@ -84,31 +101,23 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   Text(
                     '¡Hola, ${_companyName ?? 'Comercio'}!',
                     style: theme.textTheme.headlineMedium?.copyWith(
-                      color:
-                          isDark
-                              ? theme.colorScheme.onBackground
-                              : theme.colorScheme.onPrimary,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '¡Bienvenido a tu dashboard!',
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color:
-                          isDark
-                              ? theme.colorScheme.onBackground
-                              : theme.colorScheme.onPrimary.withOpacity(0.7),
+                      color: Colors.white.withOpacity(0.8),
                     ),
                   ),
                 ],
               ),
               IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.notifications_outlined,
-                  color:
-                      isDark
-                          ? theme.colorScheme.onBackground
-                          : theme.colorScheme.onPrimary,
+                  color: Colors.white,
                 ),
                 onPressed: _showNotificationsDialog,
               ),
@@ -125,39 +134,43 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     String value,
     IconData icon,
   ) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+    final isDark = theme.brightness == Brightness.dark;
+    return GradientCard(
+      isDarkMode: isDark,
+      customGradient:
+          isDark
+              ? [
+                AppColors.statsGradientDarkStart,
+                AppColors.statsGradientDarkEnd,
+              ]
+              : [AppColors.statsGradientStart, AppColors.statsGradientEnd],
+      builder:
+          (iconColor, titleColor, textColor) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: iconColor, size: 24),
               ),
-              child: Icon(icon, color: theme.colorScheme.primary, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
     );
   }
 
@@ -192,9 +205,9 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             ),
             _buildQuickActionCard(
               context,
-              icon: Icons.shopping_cart_outlined,
+              icon: Icons.receipt_long_outlined,
               title: 'Pedidos',
-              onTap: () => router.push("/commerce-orders"),
+              onTap: () => router.push('/commerce-orders'),
             ),
             _buildQuickActionCard(
               context,
@@ -221,37 +234,47 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+    // Determinar el gradiente según el título
+    List<Color> gradient;
+    if (title.contains('Productos')) {
+      gradient = [
+        AppColors.productsGradientStart,
+        AppColors.productsGradientEnd,
+      ];
+    } else if (title.contains('Pedidos')) {
+      gradient = [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+    } else {
+      gradient = [
+        AppColors.analyticsGradientStart,
+        AppColors.analyticsGradientEnd,
+      ];
+    }
+
+    // Si es modo oscuro, hacer el gradiente más suave
+    if (isDark) {
+      gradient = gradient.map((color) => color.withOpacity(0.7)).toList();
+    }
+
+    return GradientCard(
+      isDarkMode: isDark,
+      customGradient: gradient,
+      onTap: onTap,
+      builder:
+          (iconColor, titleColor, textColor) => Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color:
-                    isDark
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.primary,
-              ),
+              Icon(icon, size: 32, color: iconColor),
               const SizedBox(height: 8),
               Text(
                 title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: titleColor,
                 ),
                 textAlign: TextAlign.center,
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 
@@ -266,16 +289,76 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   }
 
   void _showNotificationsDialog() {
-    // TODO(jorge): Implementar notificaciones
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notificaciones próximamente'),
-        duration: Duration(seconds: 2),
-      ),
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                Icon(
+                  Icons.notifications_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                const Text('Notificaciones'),
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
+                      child: Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    title: const Text('Nuevo pedido recibido'),
+                    subtitle: const Text('Hace 5 minutos'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navegar a la pantalla de pedidos
+                      Navigator.pushNamed(context, '/commerce/orders');
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
+                      child: Icon(
+                        Icons.inventory_2_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    title: const Text('Stock bajo en productos'),
+                    subtitle: const Text('Hace 1 hora'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navegar a la pantalla de productos
+                      Navigator.pushNamed(context, '/commerce/products');
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cerrar'),
+              ),
+            ],
+          ),
     );
   }
 
-  Future<bool?> showLogoutConfirmationDialog(BuildContext context) async {
+  Future<bool?> showExitConfirmationDialog(BuildContext context) async {
     return showDialog<bool>(
       context: context,
       builder:
@@ -296,6 +379,42 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     );
   }
 
+  Future<bool?> showLogoutConfirmation(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('¿Estás seguro?'),
+            content: const Text('¿Deseas cerrar sesión?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Cerrar sesión'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        // Ya estamos en Home
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/commerce/profile');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -303,32 +422,22 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
 
     return WillPopScope(
       onWillPop: () async {
-        final shouldPop = await showLogoutConfirmationDialog(context);
+        final shouldPop = await showLogoutConfirmation(context);
         return shouldPop ?? false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Dashboard'),
-          automaticallyImplyLeading: false,
-          backgroundColor: theme.colorScheme.primary,
-          titleTextStyle: theme.textTheme.headlineMedium?.copyWith(
-            color:
-                isDark
-                    ? theme.colorScheme.onBackground
-                    : theme.colorScheme.onPrimary,
-          ),
+        appBar: GradientAppBar(
+          title: 'Dashboard',
+          isDarkMode: isDark,
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
-              color:
-                  isDark
-                      ? theme.colorScheme.onBackground
-                      : theme.colorScheme.onPrimary,
               onPressed: () async {
-                final shouldLogout = await showLogoutConfirmationDialog(
-                  context,
-                );
-                if (shouldLogout == true && context.mounted) {
+                final shouldLogout = await showLogoutConfirmation(context);
+                if (shouldLogout == true) {
+                  ref
+                      .read(commerceLoginControllerProvider.notifier)
+                      .state = const AsyncValue.data(null);
                   await FirebaseAuth.instance.signOut();
                   if (context.mounted) {
                     context.go('/commerce-login');
@@ -386,6 +495,15 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),
                   ],
                 ),
+        bottomNavigationBar: GradientBottomBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          isDarkMode: isDark,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          ],
+        ),
       ),
     );
   }

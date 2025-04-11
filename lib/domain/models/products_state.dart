@@ -30,4 +30,4 @@ class ProductsState {
       searchQuery: searchQuery ?? this.searchQuery,
     );
   }
-} 
+}

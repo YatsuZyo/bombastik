@@ -98,4 +98,9 @@ class AuthService {
       return null;
     }
   }
+
+  // Método para obtener el usuario actual
+  Future<User?> getCurrentUser() async {
+    return _auth.currentUser;
+  }
 }
