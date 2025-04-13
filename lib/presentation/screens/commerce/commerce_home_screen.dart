@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bombastik/presentation/widgets/gradient_card.dart';
 import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
+import 'package:flutter/services.dart';
 
 class CommerceHomeScreen extends ConsumerStatefulWidget {
   const CommerceHomeScreen({super.key});
@@ -473,25 +474,122 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   Future<bool> _onWillPop() async {
     if (!mounted) return false;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final shouldPop = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('¿Estás seguro?'),
-            content: const Text('¿Deseas salir de la aplicación?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text('Cancelar'),
+          (dialogContext) => TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 250),
+            tween: Tween(begin: 0.8, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder:
+                (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+            child: AlertDialog(
+              backgroundColor: theme.cardColor,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
               ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: const Text('Salir'),
+              icon: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors:
+                        isDark
+                            ? [
+                              AppColors.statsGradientDarkStart,
+                              AppColors.statsGradientDarkEnd,
+                            ]
+                            : [
+                              AppColors.statsGradientStart,
+                              AppColors.statsGradientEnd,
+                            ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.exit_to_app_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
-            ],
+              title: Text(
+                '¿Salir de la Aplicación?',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                'Si sales de la aplicación, tendrás que volver a abrirla para acceder a tu cuenta. ¿Estás seguro?',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop(true);
+                      if (mounted) {
+                        SystemNavigator.pop();
+                      }
+                    },
+                    child: const Text(
+                      'Salir',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
     );
-    return shouldPop ?? false;
+
+    return false;
   }
 
   @override
@@ -499,8 +597,15 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldExit = await _onWillPop();
+        if (shouldExit && mounted) {
+          SystemNavigator.pop();
+        }
+      },
       child: Scaffold(
         appBar: GradientAppBar(
           title: 'Dashboard',
