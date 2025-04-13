@@ -19,6 +19,8 @@ import 'package:bombastik/presentation/screens/commerce/commerce_home_screen.dar
 import 'package:bombastik/presentation/screens/commerce/products/products_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/orders/orders_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/promotions/promotions_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/profile/commerce_profile_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/commerce_dashboard_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -147,41 +149,50 @@ GoRouter appRouter(ref) {
               child: const CommerceSignInScreen(),
             ),
       ),
-      GoRoute(
-        path: '/commerce-home',
-        name: 'commerce-home',
-        pageBuilder:
-            (context, state) => MaterialPage(
+      ShellRoute(
+        builder: (context, state, child) => CommerceDashboard(child: child),
+        routes: [
+          GoRoute(
+            path: '/commerce-home',
+            name: 'commerce-home',
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const CommerceHomeScreen(),
             ),
-      ),
-      GoRoute(
-        path: '/commerce-products',
-        name: 'commerce-products',
-        pageBuilder:
-            (context, state) => MaterialPage(
+          ),
+          GoRoute(
+            path: '/commerce-profile',
+            name: 'commerce-profile',
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const CommerceProfileScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/commerce-products',
+            name: 'commerce-products',
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const ProductsScreen(),
             ),
-      ),
-      GoRoute(
-        path: '/commerce-orders',
-        name: 'commerce-orders',
-        pageBuilder:
-            (context, state) => MaterialPage(
+          ),
+          GoRoute(
+            path: '/commerce-orders',
+            name: 'commerce-orders',
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const OrdersScreen(),
             ),
-      ),
-      GoRoute(
-        path: '/commerce-promotions',
-        name: 'commerce-promotions',
-        pageBuilder:
-            (context, state) => MaterialPage(
+          ),
+          GoRoute(
+            path: '/commerce-promotions',
+            name: 'commerce-promotions',
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const PromotionsScreen(),
             ),
+          ),
+        ],
       ),
     ],
     redirect: (BuildContext context, GoRouterState state) {
