@@ -21,6 +21,12 @@ class AppColors {
   static const darkGradientStart = Color(0xFF568028);   // Verde principal oscuro
   static const darkGradientEnd = Color(0xFF2A7654);     // Verde secundario oscuro
   
+  // Gradientes para el encabezado
+  static const headerGradientStart = Color(0xFF86C144);  // Verde principal
+  static const headerGradientEnd = Color(0xFF42B883);    // Verde secundario
+  static const headerGradientDarkStart = Color(0xFF568028);   // Verde principal oscuro
+  static const headerGradientDarkEnd = Color(0xFF2A7654);     // Verde secundario oscuro
+  
   // Gradientes para estadísticas (Verde)
   static const statsGradientStart = Color(0xFF87CF45);
   static const statsGradientEnd = Color(0xFF42B883);

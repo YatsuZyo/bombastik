@@ -1,20 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:bombastik/config/router/app_router.dart';
-import 'package:bombastik/domain/use_cases/commerce_login.dart';
+import 'package:bombastik/domain/providers/commerce_profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bombastik/config/themes/app_theme.dart';
-import 'package:bombastik/presentation/widgets/custom_text_field.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:bombastik/presentation/screens/commerce/components/show_logout_confirmation.dart';
-import 'package:flutter/services.dart';
 import 'package:bombastik/presentation/widgets/gradient_card.dart';
 import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
-import 'package:bombastik/presentation/widgets/gradient_bottom_bar.dart';
-import 'package:bombastik/presentation/providers/commerce_providers/auth/commerce_auth_provider.dart';
 
 class CommerceHomeScreen extends ConsumerStatefulWidget {
   const CommerceHomeScreen({super.key});
@@ -26,34 +20,19 @@ class CommerceHomeScreen extends ConsumerStatefulWidget {
 class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   final _searchController = TextEditingController();
   final bool _isLoading = false;
-  String? _companyName;
-  int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadCommerceData();
-  }
+    // Cargar los datos solo si no están disponibles
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
 
-  Future<void> _loadCommerceData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    try {
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('commerces')
-              .doc(user.uid)
-              .get();
-
-      if (doc.exists) {
-        setState(() {
-          _companyName = doc.data()?['companyName'] as String?;
-        });
+      final profileState = ref.read(commerceProfileControllerProvider);
+      if (profileState.value == null && !profileState.isLoading) {
+        ref.read(commerceProfileControllerProvider.notifier).refreshProfile();
       }
-    } catch (e) {
-      debugPrint('Error loading commerce data: $e');
-    }
+    });
   }
 
   @override
@@ -63,6 +42,8 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   }
 
   Widget _buildHeader(ThemeData theme, bool isDark) {
+    final profileAsync = ref.watch(commerceProfileControllerProvider);
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -95,24 +76,34 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '¡Hola, ${_companyName ?? 'Comercio'}!',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profileAsync.maybeWhen(
+                        data:
+                            (profile) =>
+                                profile?.companyName != null
+                                    ? '¡Hola, ${profile!.companyName}!'
+                                    : '¡Hola, Comercio!',
+                        orElse: () => '¡Hola, Comercio!',
+                      ),
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '¡Bienvenido a tu dashboard!',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.8),
+                    const SizedBox(height: 4),
+                    Text(
+                      '¡Bienvenido a tu dashboard!',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               IconButton(
                 icon: const Icon(
@@ -289,15 +280,17 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   }
 
   void _showNotificationsDialog() {
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (dialogContext) => AlertDialog(
             title: Row(
               children: [
                 Icon(
                   Icons.notifications_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(dialogContext).colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
                 const Text('Notificaciones'),
@@ -311,38 +304,38 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(
-                        context,
+                        dialogContext,
                       ).colorScheme.primary.withOpacity(0.1),
                       child: Icon(
                         Icons.shopping_bag_outlined,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(dialogContext).colorScheme.primary,
                       ),
                     ),
                     title: const Text('Nuevo pedido recibido'),
                     subtitle: const Text('Hace 5 minutos'),
                     onTap: () {
-                      Navigator.pop(context);
-                      // Navegar a la pantalla de pedidos
-                      Navigator.pushNamed(context, '/commerce/orders');
+                      Navigator.pop(dialogContext);
+                      if (!mounted) return;
+                      context.push('/commerce-orders');
                     },
                   ),
                   const Divider(),
                   ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(
-                        context,
+                        dialogContext,
                       ).colorScheme.primary.withOpacity(0.1),
                       child: Icon(
                         Icons.inventory_2_outlined,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(dialogContext).colorScheme.primary,
                       ),
                     ),
                     title: const Text('Stock bajo en productos'),
                     subtitle: const Text('Hace 1 hora'),
                     onTap: () {
-                      Navigator.pop(context);
-                      // Navegar a la pantalla de productos
-                      Navigator.pushNamed(context, '/commerce/products');
+                      Navigator.pop(dialogContext);
+                      if (!mounted) return;
+                      context.push('/commerce-products');
                     },
                   ),
                 ],
@@ -350,7 +343,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: const Text('Cerrar'),
               ),
             ],
@@ -358,61 +351,147 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     );
   }
 
-  Future<bool?> showExitConfirmationDialog(BuildContext context) async {
-    return showDialog<bool>(
+  Future<void> _showLogoutConfirmation(BuildContext context) async {
+    if (!mounted) return;
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final shouldLogout = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
+          (dialogContext) => TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 250),
+            tween: Tween(begin: 0.8, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder:
+                (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+            child: AlertDialog(
+              backgroundColor: theme.cardColor,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              icon: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors:
+                        isDark
+                            ? [
+                              AppColors.statsGradientDarkStart,
+                              AppColors.statsGradientDarkEnd,
+                            ]
+                            : [
+                              AppColors.statsGradientStart,
+                              AppColors.statsGradientEnd,
+                            ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+              title: Text(
+                '¿Cerrar Sesión?',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                '¿Estás seguro que deseas cerrar tu sesión? Tendrás que iniciar sesión nuevamente para acceder a tu cuenta.',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                    child: const Text(
+                      'Cerrar Sesión',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+
+    if (shouldLogout == true && mounted) {
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      context.go('/commerce-login');
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (!mounted) return false;
+
+    final shouldPop = await showDialog<bool>(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
             title: const Text('¿Estás seguro?'),
             content: const Text('¿Deseas salir de la aplicación?'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () => Navigator.of(dialogContext).pop(false),
                 child: const Text('Cancelar'),
               ),
               TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () => Navigator.of(dialogContext).pop(true),
                 child: const Text('Salir'),
               ),
             ],
           ),
     );
-  }
-
-  Future<bool?> showLogoutConfirmation(BuildContext context) async {
-    return showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('¿Estás seguro?'),
-            content: const Text('¿Deseas cerrar sesión?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Cerrar sesión'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        // Ya estamos en Home
-        break;
-      case 1:
-        context.push('/commerce-profile');
-        break;
-    }
+    return shouldPop ?? false;
   }
 
   @override
@@ -421,10 +500,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return WillPopScope(
-      onWillPop: () async {
-        final shouldPop = await showLogoutConfirmation(context);
-        return shouldPop ?? false;
-      },
+      onWillPop: _onWillPop,
       child: Scaffold(
         appBar: GradientAppBar(
           title: 'Dashboard',
@@ -432,18 +508,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
-              onPressed: () async {
-                final shouldLogout = await showLogoutConfirmation(context);
-                if (shouldLogout == true) {
-                  ref
-                      .read(commerceLoginControllerProvider.notifier)
-                      .state = const AsyncValue.data(null);
-                  await FirebaseAuth.instance.signOut();
-                  if (context.mounted) {
-                    context.go('/commerce-login');
-                  }
-                }
-              },
+              onPressed: () => _showLogoutConfirmation(context),
             ),
           ],
         ),
@@ -495,15 +560,6 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),
                   ],
                 ),
-        bottomNavigationBar: GradientBottomBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          isDarkMode: isDark,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-          ],
-        ),
       ),
     );
   }

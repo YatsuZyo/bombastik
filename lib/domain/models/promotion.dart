@@ -2,18 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 enum PromotionType {
-  percentage,    // Descuento porcentual
-  fixedAmount,   // Descuento de monto fijo
-  buyXGetY,      // Compra X lleva Y
-  bundle         // Combo de productos
+  percentage, // Descuento porcentual
+  fixedAmount, // Descuento de monto fijo
+  buyXGetY, // Compra X lleva Y
+  bundle, // Combo de productos
 }
 
-enum PromotionStatus {
-  active,
-  scheduled,
-  expired,
-  cancelled
-}
+enum PromotionStatus { active, scheduled, expired, cancelled }
 
 class Promotion {
   final String? id;
@@ -22,17 +17,18 @@ class Promotion {
   final String description;
   final PromotionType type;
   final PromotionStatus status;
-  final double value;        // Porcentaje o monto fijo del descuento
+  final double value; // Porcentaje o monto fijo del descuento
   final DateTime startDate;
   final DateTime endDate;
   final List<String> productIds; // IDs de productos aplicables
-  final String? categoryId;  // Nueva propiedad para categoría
+  final String? categoryId; // Nueva propiedad para categoría
   final double? minPurchaseAmount; // Monto mínimo de compra
-  final int? maxUses;       // Máximo de usos permitidos
-  final int? usedCount;     // Veces que se ha usado
-  final String? imageUrl;   // Imagen promocional
-  final String? code;  // Nueva propiedad para código promocional
-  final Map<String, bool>? usedByCustomers;  // Nueva propiedad para rastrear uso por cliente
+  final int? maxUses; // Máximo de usos permitidos
+  final int? usedCount; // Veces que se ha usado
+  final String? imageUrl; // Imagen promocional
+  final String? code; // Nueva propiedad para código promocional
+  final Map<String, bool>?
+  usedByCustomers; // Nueva propiedad para rastrear uso por cliente
 
   const Promotion({
     this.id,
@@ -45,7 +41,7 @@ class Promotion {
     required this.startDate,
     required this.endDate,
     required this.productIds,
-    this.categoryId,  // Opcional: puede ser por categoría o por productos
+    this.categoryId, // Opcional: puede ser por categoría o por productos
     this.minPurchaseAmount,
     this.maxUses,
     this.usedCount,
@@ -119,14 +115,14 @@ class Promotion {
   factory Promotion.fromMap(Map<String, dynamic> map) {
     try {
       debugPrint('Convirtiendo mapa a Promotion: $map');
-      
+
       // Validar campos requeridos
-      if (map['title'] == null || 
-          map['description'] == null || 
-          map['type'] == null || 
-          map['status'] == null || 
-          map['value'] == null || 
-          map['startDate'] == null || 
+      if (map['title'] == null ||
+          map['description'] == null ||
+          map['type'] == null ||
+          map['status'] == null ||
+          map['value'] == null ||
+          map['startDate'] == null ||
           map['endDate'] == null) {
         throw Exception('Campos requeridos faltantes en la promoción');
       }
@@ -134,12 +130,12 @@ class Promotion {
       // Convertir tipo y estado
       final typeString = map['type'].toString();
       final statusString = map['status'].toString();
-      
+
       final type = PromotionType.values.firstWhere(
         (e) => e.toString() == typeString,
         orElse: () => PromotionType.percentage,
       );
-      
+
       final status = PromotionStatus.values.firstWhere(
         (e) => e.toString() == statusString,
         orElse: () => PromotionStatus.active,
@@ -169,9 +165,10 @@ class Promotion {
       // Convertir mapa de clientes
       Map<String, bool>? usedByCustomers;
       try {
-        usedByCustomers = map['usedByCustomers'] != null 
-            ? Map<String, bool>.from(map['usedByCustomers'])
-            : null;
+        usedByCustomers =
+            map['usedByCustomers'] != null
+                ? Map<String, bool>.from(map['usedByCustomers'])
+                : null;
       } catch (e) {
         debugPrint('Error al convertir usedByCustomers: $e');
         usedByCustomers = null;
@@ -201,4 +198,4 @@ class Promotion {
       rethrow;
     }
   }
-} 
+}

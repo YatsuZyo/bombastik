@@ -1,5 +1,7 @@
 import 'package:bombastik/config/router/app_router.dart';
 import 'package:bombastik/config/themes/app_theme.dart';
+import 'package:bombastik/domain/models/commerce_profile.dart';
+import 'package:bombastik/domain/providers/commerce_profile_provider.dart';
 import 'package:bombastik/domain/use_cases/commerce_login.dart';
 import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,58 +11,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CommerceProfileScreen extends ConsumerStatefulWidget {
+class CommerceProfileScreen extends ConsumerWidget {
   const CommerceProfileScreen({super.key});
 
-  @override
-  ConsumerState<CommerceProfileScreen> createState() =>
-      _CommerceProfileScreenState();
-}
-
-class _CommerceProfileScreenState extends ConsumerState<CommerceProfileScreen> {
-  String? _companyName;
-  String? _email;
-  String? _phone;
-  String? _address;
-  String? _category;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCommerceData();
-  }
-
-  Future<void> _loadCommerceData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    try {
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('commerces')
-              .doc(user.uid)
-              .get();
-
-      if (doc.exists && mounted) {
-        setState(() {
-          _companyName = doc.data()?['companyName'] as String?;
-          _email = doc.data()?['email'] as String?;
-          _phone = doc.data()?['phone'] as String?;
-          _address = doc.data()?['address'] as String?;
-          _category = doc.data()?['category'] as String?;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading commerce data: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Widget _buildProfileSection(ThemeData theme, bool isDark) {
+  Widget _buildProfileSection(
+    ThemeData theme,
+    bool isDark,
+    CommerceProfile profile,
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -96,13 +54,13 @@ class _CommerceProfileScreenState extends ConsumerState<CommerceProfileScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            _companyName ?? 'Comercio',
+            profile.companyName ?? 'Comercio',
             style: theme.textTheme.headlineMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (_category != null) ...[
+          if (profile.category != null) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -111,7 +69,7 @@ class _CommerceProfileScreenState extends ConsumerState<CommerceProfileScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                _category!,
+                profile.category!,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
@@ -242,9 +200,10 @@ class _CommerceProfileScreenState extends ConsumerState<CommerceProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final profileAsync = ref.watch(commerceProfileControllerProvider);
 
     return Scaffold(
       appBar: GradientAppBar(
@@ -252,120 +211,191 @@ class _CommerceProfileScreenState extends ConsumerState<CommerceProfileScreen> {
         isDarkMode: isDark,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.go('/commerce-home'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed:
+                () =>
+                    ref
+                        .read(commerceProfileControllerProvider.notifier)
+                        .refreshProfile(),
+          ),
+        ],
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildProfileSection(theme, isDark),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Información del Comercio',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoTile(
-                            icon: Icons.email_outlined,
-                            title: 'Correo Electrónico',
-                            value: _email,
-                            theme: theme,
-                          ),
-                          _buildInfoTile(
-                            icon: Icons.phone_outlined,
-                            title: 'Teléfono',
-                            value: _phone,
-                            theme: theme,
-                          ),
-                          _buildInfoTile(
-                            icon: Icons.location_on_outlined,
-                            title: 'Dirección',
-                            value: _address,
-                            theme: theme,
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Acciones',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildActionButton(
-                            icon: Icons.edit_outlined,
-                            label: 'Editar Perfil',
-                            onTap: () {
-                              // TODO: Implementar edición de perfil
-                            },
-                            theme: theme,
-                          ),
-                          _buildActionButton(
-                            icon: Icons.settings_outlined,
-                            label: 'Configuración',
-                            onTap: () {
-                              // TODO: Implementar configuración
-                            },
-                            theme: theme,
-                          ),
-                          _buildActionButton(
-                            icon: Icons.logout,
-                            label: 'Cerrar Sesión',
-                            onTap: () async {
-                              final shouldLogout = await showDialog<bool>(
-                                context: context,
-                                builder:
-                                    (context) => AlertDialog(
-                                      title: const Text('¿Estás seguro?'),
-                                      content: const Text(
-                                        '¿Deseas cerrar sesión?',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed:
-                                              () =>
-                                                  Navigator.pop(context, false),
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        FilledButton(
-                                          onPressed:
-                                              () =>
-                                                  Navigator.pop(context, true),
-                                          child: const Text('Cerrar Sesión'),
-                                        ),
-                                      ],
-                                    ),
-                              );
-
-                              if (shouldLogout == true && mounted) {
-                                ref
-                                    .read(
-                                      commerceLoginControllerProvider.notifier,
-                                    )
-                                    .state = const AsyncValue.data(null);
-                                await FirebaseAuth.instance.signOut();
-                                if (context.mounted) {
-                                  context.go('/commerce-login');
-                                }
-                              }
-                            },
-                            theme: theme,
-                            color: Colors.red,
-                          ),
-                        ],
-                      ),
+      body: profileAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error al cargar el perfil',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error.toString(),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.red,
                     ),
-                  ],
-                ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed:
+                        () => ref.refresh(commerceProfileControllerProvider),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
               ),
+            ),
+        data: (profile) {
+          if (profile == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.account_circle_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No se encontró el perfil del comercio',
+                    style: theme.textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Por favor, asegúrate de que has iniciado sesión correctamente',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed:
+                        () => ref.refresh(commerceProfileControllerProvider),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildProfileSection(theme, isDark, profile),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Información del Comercio',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildInfoTile(
+                        icon: Icons.email_outlined,
+                        title: 'Correo Electrónico',
+                        value: profile.email,
+                        theme: theme,
+                      ),
+                      _buildInfoTile(
+                        icon: Icons.phone_outlined,
+                        title: 'Teléfono',
+                        value: profile.phone,
+                        theme: theme,
+                      ),
+                      _buildInfoTile(
+                        icon: Icons.location_on_outlined,
+                        title: 'Dirección',
+                        value: profile.address,
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Acciones',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildActionButton(
+                        icon: Icons.edit_outlined,
+                        label: 'Editar Perfil',
+                        onTap: () {
+                          // TODO: Implementar edición de perfil
+                        },
+                        theme: theme,
+                      ),
+                      _buildActionButton(
+                        icon: Icons.settings_outlined,
+                        label: 'Configuración',
+                        onTap: () {
+                          // TODO: Implementar configuración
+                        },
+                        theme: theme,
+                      ),
+                      _buildActionButton(
+                        icon: Icons.logout,
+                        label: 'Cerrar Sesión',
+                        onTap: () async {
+                          final shouldLogout = await showDialog<bool>(
+                            context: context,
+                            builder:
+                                (context) => AlertDialog(
+                                  title: const Text('¿Estás seguro?'),
+                                  content: const Text('¿Deseas cerrar sesión?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, false),
+                                      child: const Text('Cancelar'),
+                                    ),
+                                    FilledButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, true),
+                                      child: const Text('Cerrar Sesión'),
+                                    ),
+                                  ],
+                                ),
+                          );
+
+                          if (shouldLogout == true) {
+                            ref
+                                .read(commerceLoginControllerProvider.notifier)
+                                .state = const AsyncValue.data(null);
+                            await FirebaseAuth.instance.signOut();
+                            if (context.mounted) {
+                              context.go('/commerce-login');
+                            }
+                          }
+                        },
+                        theme: theme,
+                        color: Colors.red,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
