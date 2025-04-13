@@ -410,7 +410,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
         // Ya estamos en Home
         break;
       case 1:
-        Navigator.pushNamed(context, '/commerce/profile');
+        context.push('/commerce-profile');
         break;
     }
   }

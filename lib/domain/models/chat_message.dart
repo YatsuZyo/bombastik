@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-
-enum MessageType {
-  user,
-  assistant,
-}
+enum MessageType { user, assistant }
 
 class ChatMessage {
   final String id;
@@ -48,10 +43,7 @@ class ChatMessage {
     );
   }
 
-  ChatMessage copyWith({
-    String? content,
-    bool? isLoading,
-  }) {
+  ChatMessage copyWith({String? content, bool? isLoading}) {
     return ChatMessage(
       id: id,
       content: content ?? this.content,
@@ -60,4 +52,4 @@ class ChatMessage {
       isLoading: isLoading ?? this.isLoading,
     );
   }
-} 
+}
