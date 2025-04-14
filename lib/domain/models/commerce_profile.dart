@@ -11,6 +11,7 @@ class CommerceProfile {
   final String category;  // Ahora requerido
   final DateTime createdAt;
   final bool isActive;
+  final String? photoUrl;  // URL de la foto de perfil
 
   CommerceProfile({
     this.uid,
@@ -22,6 +23,7 @@ class CommerceProfile {
     required this.category,
     DateTime? createdAt,
     this.isActive = true,
+    this.photoUrl,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Validador de RIF
@@ -84,6 +86,7 @@ class CommerceProfile {
       category: map['category'] as String? ?? availableCategories.first,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
       isActive: map['isActive'] as bool? ?? true,
+      photoUrl: map['photoUrl'] as String?,
     );
   }
 
@@ -99,6 +102,7 @@ class CommerceProfile {
       'createdAt': FieldValue.serverTimestamp(),
       'isActive': isActive,
       'role': 'commerce',
+      if (photoUrl != null) 'photoUrl': photoUrl,
     };
   }
 
@@ -112,6 +116,7 @@ class CommerceProfile {
     String? category,
     DateTime? createdAt,
     bool? isActive,
+    String? photoUrl,
   }) {
     return CommerceProfile(
       uid: uid ?? this.uid,
@@ -123,11 +128,12 @@ class CommerceProfile {
       category: category ?? this.category,
       createdAt: createdAt ?? this.createdAt,
       isActive: isActive ?? this.isActive,
+      photoUrl: photoUrl ?? this.photoUrl,
     );
   }
 
   @override
   String toString() {
-    return 'CommerceProfile(uid: $uid, companyName: $companyName, rif: $rif, email: $email, category: $category)';
+    return 'CommerceProfile(uid: $uid, companyName: $companyName, rif: $rif, email: $email, category: $category, photoUrl: $photoUrl)';
   }
 } 
