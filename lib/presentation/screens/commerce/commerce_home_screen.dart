@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bombastik/presentation/widgets/gradient_card.dart';
 import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CommerceHomeScreen extends ConsumerStatefulWidget {
   const CommerceHomeScreen({super.key});
@@ -168,50 +169,122 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
 
   Widget _buildQuickActions(ThemeData theme) {
     final router = ref.read(appRouterProvider);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Text(
-            'Acciones Rápidas',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      theme.colorScheme.surface.withOpacity(0.3),
+                      theme.colorScheme.surface.withOpacity(0.1),
+                    ]
+                  : [
+                      const Color(0xFFE0F2F1).withOpacity(0.9),
+                      const Color(0xFFB2DFDB).withOpacity(0.6),
+                      const Color(0xFF80CBC4).withOpacity(0.3),
+                    ],
+              stops: isDark ? [0.0, 1.0] : [0.0, 0.5, 1.0],
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark 
+                    ? Colors.black12 
+                    : const Color(0xFF80CBC4).withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -15,
+                top: 0,
+                bottom: 0,
+                child: Icon(
+                  Icons.flash_on_rounded,
+                  size: 64,
+                  color: isDark 
+                      ? theme.colorScheme.primary 
+                      : const Color(0xFF00897B),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Acciones Rápidas',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: isDark 
+                          ? theme.colorScheme.onBackground 
+                          : const Color(0xFF00897B),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Gestiona tu negocio de manera eficiente',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: isDark 
+                            ? theme.colorScheme.onBackground.withOpacity(0.7)
+                            : const Color(0xFF00897B).withOpacity(0.7),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          children: [
-            _buildQuickActionCard(
-              context,
-              icon: Icons.inventory_2_outlined,
-              title: 'Gestionar Productos',
-              onTap: () => router.push('/commerce-products'),
-            ),
-            _buildQuickActionCard(
-              context,
-              icon: Icons.receipt_long_outlined,
-              title: 'Pedidos',
-              onTap: () => router.push('/commerce-orders'),
-            ),
-            _buildQuickActionCard(
-              context,
-              icon: Icons.analytics_outlined,
-              title: 'Estadísticas',
-              onTap:
-                  () => _showComingSoonSnackbar(
-                    context,
-                    'Estadísticas (próximamente)',
-                  ),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            children: [
+              _buildQuickActionCard(
+                context,
+                icon: Icons.inventory_2_outlined,
+                title: 'Gestionar\nProductos',
+                onTap: () => router.push('/commerce-products'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.receipt_long_outlined,
+                title: 'Ver\nPedidos',
+                onTap: () => router.push('/commerce-orders'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.local_offer_outlined,
+                title: 'Gestionar\nPromociones',
+                onTap: () => router.push('/commerce-promotions'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.analytics_outlined,
+                title: 'Ver\nEstadísticas',
+                onTap: () => router.push('/commerce-stats'),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -228,45 +301,101 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
 
     // Determinar el gradiente según el título
     List<Color> gradient;
+    Color iconBackgroundColor;
+    Color iconColor;
+
     if (title.contains('Productos')) {
-      gradient = [
-        AppColors.productsGradientStart,
-        AppColors.productsGradientEnd,
-      ];
+      gradient = isDark
+          ? [
+              AppColors.productsGradientStart.withOpacity(0.8),
+              AppColors.productsGradientEnd.withOpacity(0.9),
+            ]
+          : [AppColors.productsGradientStart, AppColors.productsGradientEnd];
+      iconBackgroundColor = AppColors.productsGradientStart.withOpacity(0.2);
+      iconColor = AppColors.productsGradientEnd;
     } else if (title.contains('Pedidos')) {
-      gradient = [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+      gradient = isDark
+          ? [
+              AppColors.ordersGradientStart.withOpacity(0.8),
+              AppColors.ordersGradientEnd.withOpacity(0.9),
+            ]
+          : [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+      iconBackgroundColor = AppColors.ordersGradientStart.withOpacity(0.2);
+      iconColor = AppColors.ordersGradientEnd;
+    } else if (title.contains('Promociones')) {
+      gradient = isDark
+          ? [
+              const Color(0xFF9C27B0).withOpacity(0.8),
+              const Color(0xFFE91E63).withOpacity(0.9),
+            ]
+          : [const Color(0xFF9C27B0), const Color(0xFFE91E63)];
+      iconBackgroundColor = const Color(0xFF9C27B0).withOpacity(0.2);
+      iconColor = const Color(0xFFE91E63);
     } else {
-      gradient = [
-        AppColors.analyticsGradientStart,
-        AppColors.analyticsGradientEnd,
-      ];
+      gradient = isDark
+          ? [
+              AppColors.analyticsGradientStart.withOpacity(0.8),
+              AppColors.analyticsGradientEnd.withOpacity(0.9),
+            ]
+          : [AppColors.analyticsGradientStart, AppColors.analyticsGradientEnd];
+      iconBackgroundColor = AppColors.analyticsGradientStart.withOpacity(0.2);
+      iconColor = AppColors.analyticsGradientEnd;
     }
 
-    // Si es modo oscuro, hacer el gradiente más suave
-    if (isDark) {
-      gradient = gradient.map((color) => color.withOpacity(0.7)).toList();
-    }
-
-    return GradientCard(
-      isDarkMode: isDark,
-      customGradient: gradient,
-      onTap: onTap,
-      builder:
-          (iconColor, titleColor, textColor) => Column(
+    return Card(
+      elevation: 4,
+      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: gradient[0].withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradient,
+            ),
+          ),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32, color: iconColor),
-              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
                 title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: titleColor,
-                ),
                 textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: 0.2,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
+        ),
+      ),
     );
   }
 
