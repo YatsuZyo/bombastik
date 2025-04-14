@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Función para verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función para verificar si el usuario es un comercio
+    function isCommerce() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'commerce';
+    }
+    
+    // Función para verificar si el usuario es el propietario
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Reglas para la colección users
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId);
+      allow list: if true;
+    }
+    
+    // Reglas para la colección orders
+    match /orders/{orderId} {
+      // Permitir lectura si el usuario es el comercio asociado a la orden
+      allow read: if isAuthenticated() && 
+                 (isCommerce() && resource.data.commerceId == request.auth.uid);
+      
+      // Permitir actualización si el usuario es el comercio asociado a la orden
+      allow update: if isAuthenticated() && 
+                   isCommerce() && 
+                   resource.data.commerceId == request.auth.uid;
+      
+      // Permitir listar órdenes si el usuario es un comercio
+      allow list: if isAuthenticated() && isCommerce();
+    }
+    
+    match /commerces/{commerceId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(commerceId) && isCommerce();
+      
+      match /products/{productId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isOwner(commerceId) && isCommerce();
+      }
+      
+      match /promotions/{promotionId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && isOwner(commerceId) && isCommerce();
+      }
+    }
+  }
+} 

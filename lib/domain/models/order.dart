@@ -23,8 +23,9 @@ class CommerceOrder {
   final String? notes;
   final String? deliveryAddress;
   final bool isDelivery;
+  final double deliveryFee;
 
-  CommerceOrder({
+  const CommerceOrder({
     required this.id,
     required this.commerceId,
     required this.clientId,
@@ -37,6 +38,7 @@ class CommerceOrder {
     this.notes,
     this.deliveryAddress,
     this.isDelivery = false,
+    this.deliveryFee = 0.0,
   });
 
   factory CommerceOrder.fromMap(Map<String, dynamic> map) {
@@ -59,6 +61,7 @@ class CommerceOrder {
       notes: map['notes'] as String?,
       deliveryAddress: map['deliveryAddress'] as String?,
       isDelivery: map['isDelivery'] as bool? ?? false,
+      deliveryFee: (map['deliveryFee'] as num).toDouble(),
     );
   }
 
@@ -76,6 +79,7 @@ class CommerceOrder {
       'notes': notes,
       'deliveryAddress': deliveryAddress,
       'isDelivery': isDelivery,
+      'deliveryFee': deliveryFee,
     };
   }
 
@@ -92,6 +96,7 @@ class CommerceOrder {
     String? notes,
     String? deliveryAddress,
     bool? isDelivery,
+    double? deliveryFee,
   }) {
     return CommerceOrder(
       id: id ?? this.id,
@@ -106,6 +111,7 @@ class CommerceOrder {
       notes: notes ?? this.notes,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
       isDelivery: isDelivery ?? this.isDelivery,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
     );
   }
 }
