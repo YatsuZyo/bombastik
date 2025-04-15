@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:bombastik/config/router/app_router.dart';
-//import 'package:bombastik/config/themes/app_theme.dart';
+import 'package:bombastik/config/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ModeSelectorScreen extends ConsumerWidget {
   const ModeSelectorScreen({super.key});
@@ -12,79 +14,109 @@ class ModeSelectorScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.read(appRouterProvider);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(125),
-        child: AppBar(
-          flexibleSpace: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 40.0),
-              child: Image.asset(
-                'assets/images/BombastikBlancoSinFondoSized.png',
-                height: 90,
-                fit: BoxFit.scaleDown,
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.darkGradientStart, AppColors.darkGradientEnd]
+                : [AppColors.lightGradientStart, AppColors.lightGradientEnd],
           ),
-          backgroundColor: theme.colorScheme.primary,
-          elevation: 0,
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  '¿Como deseas continuar?',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: theme.colorScheme.primary,
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              // Logo animado
+              Image.asset(
+                isDark
+                    ? 'assets/images/BombastikLogoDarkMode.png'
+                    : 'assets/images/BombastikBlancoSinFondoSized.png',
+                height: 130,
+                fit: BoxFit.contain,
+              ).animate().fadeIn().scale(),
+              const SizedBox(height: 30),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withOpacity(isDark ? 0.9 : 0.95),
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '¿Cómo deseas continuar?',
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ).animate().fadeIn().slideX(),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Puedes cambiar de un modo a otro siempre que quieras.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ).animate().fadeIn().slideX(),
+                      const SizedBox(height: 24),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            const Spacer(flex: 2),
+                            ModeCard(
+                              imagePath: 'assets/images/icon_cliente_resized.png',
+                              title: 'Seguir como cliente',
+                              description: '¡Navega a través de la app y encuentra las mejores ofertas!',
+                              onTap: () => router.push('/client-start'),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  theme.colorScheme.primary.withOpacity(0.8),
+                                  theme.colorScheme.primary,
+                                ],
+                              ),
+                            ).animate().fadeIn().scale().moveY(begin: 30, delay: 200.ms),
+                            const SizedBox(height: 20),
+                            ModeCard(
+                              imagePath: 'assets/images/icon_comercio.png',
+                              title: 'Seguir como comercio',
+                              description: 'Administra tu comercio y visualiza tu dashboard de órdenes.',
+                              onTap: () => router.push('/commerce-login'),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  theme.colorScheme.secondary.withOpacity(0.8),
+                                  theme.colorScheme.secondary,
+                                ],
+                              ),
+                            ).animate().fadeIn().scale().moveY(begin: 30, delay: 400.ms),
+                            const Spacer(flex: 3),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8.0),
-                Text(
-                  'Puedes cambiar de un modo a otro siempre que quieras.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24.0),
-                ModeCard(
-                  imagePath: 'assets/images/icon_cliente_resized.png',
-                  title: 'Seguir como cliente',
-                  description:
-                      '¡Navega a través de la app y encuentra las mejores ofertas!',
-                  onTap: () {
-                    router.push('/client-start');
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                ModeCard(
-                  imagePath: 'assets/images/icon_comercio.png',
-                  title: 'Seguir como comercio',
-                  description:
-                      'Administra tu comercio y visualiza tu dashboard de órdenes.',
-                  onTap: () {
-                    router.push('/commerce-login');
-                  },
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -97,6 +129,7 @@ class ModeCard extends StatelessWidget {
   final String title;
   final String description;
   final VoidCallback onTap;
+  final Gradient gradient;
 
   const ModeCard({
     super.key,
@@ -104,49 +137,78 @@ class ModeCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onTap,
+    required this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        color: theme.colorScheme.surface,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                radius: 30.0,
-                backgroundImage: AssetImage(imagePath),
-              ),
-              const SizedBox(width: 16.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(height: 8.0),
-                    Text(description, style: theme.textTheme.bodyMedium),
-                  ],
-                ),
+                    child: Image.asset(
+                      imagePath,
+                      height: 40,
+                      width: 40,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          description,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white.withOpacity(0.9),
+                    size: 24,
+                  ),
+                ],
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ],
+            ),
           ),
         ),
       ),
