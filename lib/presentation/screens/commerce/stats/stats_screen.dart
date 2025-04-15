@@ -49,6 +49,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             GradientSliverAppBar(
               title: 'Estadísticas',
               isDarkMode: isDark,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
               actions: [
                 IconButton(
                   icon: Container(
@@ -570,12 +574,19 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             final maxY = salesData.values.reduce(math.max) * 1.2;
             final minY = salesData.values.reduce(math.min) * 0.8;
 
+            // Si maxY es 0, establecemos un valor mínimo
+            final effectiveMaxY = maxY <= 0 ? 10.0 : maxY;
+            final effectiveMinY = minY < 0 ? minY : 0.0;
+
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 16.0,
+              ),
               child: AspectRatio(
-                aspectRatio: 1.7,
+                aspectRatio: 1,
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -587,6 +598,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     ),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: Theme.of(context).dividerColor),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,7 +612,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
@@ -604,29 +622,35 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                             child: Icon(
                               Icons.show_chart_rounded,
                               color: Theme.of(context).colorScheme.primary,
-                              size: 24,
+                              size: 28,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Text(
                             'Tendencia de ventas',
                             style: GoogleFonts.poppins(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Expanded(
                         child: LineChart(
                           LineChartData(
                             gridData: FlGridData(
                               show: true,
                               drawVerticalLine: true,
-                              horizontalInterval: maxY / 5,
-                              verticalInterval: 1,
+                              horizontalInterval: math.max(
+                                effectiveMaxY / 4,
+                                1.0,
+                              ),
+                              verticalInterval:
+                                  math
+                                      .max(sortedEntries.length ~/ 7, 1)
+                                      .toDouble(),
                             ),
                             titlesData: FlTitlesData(
                               show: true,
@@ -639,26 +663,35 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               bottomTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  reservedSize: 30,
-                                  interval:
-                                      (sortedEntries.length / 5)
-                                          .ceil()
-                                          .toDouble(),
+                                  reservedSize: 45,
+                                  interval: math.max(
+                                    (sortedEntries.length / 6)
+                                        .ceil()
+                                        .toDouble(),
+                                    1,
+                                  ),
                                   getTitlesWidget: (value, meta) {
-                                    if (value.toInt() >= sortedEntries.length) {
-                                      return const Text('');
+                                    if (value.toInt() >= sortedEntries.length ||
+                                        value.toInt() < 0) {
+                                      return const SizedBox();
                                     }
                                     final date = DateTime.parse(
                                       sortedEntries[value.toInt()].key,
                                     );
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        DateFormat('dd/MM').format(date),
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.bodySmall,
+                                    return Transform.rotate(
+                                      angle: -0.7,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          DateFormat('dd/MM').format(date),
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall?.color,
+                                            fontSize: 11,
+                                          ),
+                                        ),
                                       ),
                                     );
                                   },
@@ -667,13 +700,23 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               leftTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  interval: maxY / 5,
-                                  reservedSize: 42,
+                                  interval: effectiveMaxY / 4,
+                                  reservedSize: 50,
                                   getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      '\$${value.toStringAsFixed(0)}',
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: Text(
+                                        value >= 1000
+                                            ? '\$${(value / 1000).toStringAsFixed(1)}k'
+                                            : '\$${value.toStringAsFixed(0)}',
+                                        style: TextStyle(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall?.color,
+                                          fontSize: 11,
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -687,8 +730,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                             ),
                             minX: 0,
                             maxX: (sortedEntries.length - 1).toDouble(),
-                            minY: minY,
-                            maxY: maxY,
+                            minY: effectiveMinY,
+                            maxY: effectiveMaxY * 1.1,
                             lineBarsData: [
                               LineChartBarData(
                                 spots: List.generate(
@@ -700,14 +743,42 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                 ),
                                 isCurved: true,
                                 color: Theme.of(context).colorScheme.primary,
-                                barWidth: 3,
+                                barWidth: 2.5,
                                 isStrokeCapRound: true,
-                                dotData: const FlDotData(show: false),
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter:
+                                      (spot, percent, barData, index) =>
+                                          FlDotCirclePainter(
+                                            radius: 3,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                            strokeWidth: 1,
+                                            strokeColor:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.surface,
+                                          ),
+                                ),
                                 belowBarData: BarAreaData(
                                   show: true,
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.primary.withOpacity(0.1),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.2),
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.0),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
