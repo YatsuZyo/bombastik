@@ -22,6 +22,7 @@ class CommerceHomeScreen extends ConsumerStatefulWidget {
 class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   final _searchController = TextEditingController();
   final bool _isLoading = false;
+  bool _hasUnreadNotifications = true; // Estado temporal para pruebas
 
   @override
   void initState() {
@@ -107,12 +108,81 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.white,
-                ),
-                onPressed: _showNotificationsDialog,
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors:
+                              isDark
+                                  ? [
+                                    AppColors.statsGradientDarkStart
+                                        .withOpacity(0.8),
+                                    AppColors.statsGradientDarkEnd.withOpacity(
+                                      0.9,
+                                    ),
+                                  ]
+                                  : [
+                                    AppColors.statsGradientStart.withOpacity(
+                                      0.8,
+                                    ),
+                                    AppColors.statsGradientEnd.withOpacity(0.9),
+                                  ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _hasUnreadNotifications = false;
+                      });
+                      _showNotificationsDialog();
+                    },
+                  ),
+                  if (_hasUnreadNotifications)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B30),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color:
+                                isDark
+                                    ? AppColors.statsGradientDarkStart
+                                    : AppColors.statsGradientStart,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -182,23 +252,25 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      theme.colorScheme.surface.withOpacity(0.3),
-                      theme.colorScheme.surface.withOpacity(0.1),
-                    ]
-                  : [
-                      const Color(0xFFE0F2F1).withOpacity(0.9),
-                      const Color(0xFFB2DFDB).withOpacity(0.6),
-                      const Color(0xFF80CBC4).withOpacity(0.3),
-                    ],
+              colors:
+                  isDark
+                      ? [
+                        theme.colorScheme.surface.withOpacity(0.3),
+                        theme.colorScheme.surface.withOpacity(0.1),
+                      ]
+                      : [
+                        const Color(0xFFE0F2F1).withOpacity(0.9),
+                        const Color(0xFFB2DFDB).withOpacity(0.6),
+                        const Color(0xFF80CBC4).withOpacity(0.3),
+                      ],
               stops: isDark ? [0.0, 1.0] : [0.0, 0.5, 1.0],
             ),
             boxShadow: [
               BoxShadow(
-                color: isDark 
-                    ? Colors.black12 
-                    : const Color(0xFF80CBC4).withOpacity(0.1),
+                color:
+                    isDark
+                        ? Colors.black12
+                        : const Color(0xFF80CBC4).withOpacity(0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -211,11 +283,12 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                 top: 0,
                 bottom: 0,
                 child: Icon(
-                  Icons.flash_on_rounded,
-                  size: 64,
-                  color: isDark 
-                      ? theme.colorScheme.primary 
-                      : const Color(0xFF00897B),
+                  Icons.bolt_outlined,
+                  size: 60,
+                  color:
+                      isDark
+                          ? theme.colorScheme.primary
+                          : const Color(0xFF00897B),
                 ),
               ),
               Column(
@@ -226,9 +299,10 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
-                      color: isDark 
-                          ? theme.colorScheme.onBackground 
-                          : const Color(0xFF00897B),
+                      color:
+                          isDark
+                              ? theme.colorScheme.onBackground
+                              : const Color(0xFF00897B),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -238,9 +312,12 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                       'Gestiona tu negocio de manera eficiente',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: isDark 
-                            ? theme.colorScheme.onBackground.withOpacity(0.7)
-                            : const Color(0xFF00897B).withOpacity(0.7),
+                        color:
+                            isDark
+                                ? theme.colorScheme.onBackground.withOpacity(
+                                  0.7,
+                                )
+                                : const Color(0xFF00897B).withOpacity(0.7),
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -305,39 +382,49 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     Color iconColor;
 
     if (title.contains('Productos')) {
-      gradient = isDark
-          ? [
-              AppColors.productsGradientStart.withOpacity(0.8),
-              AppColors.productsGradientEnd.withOpacity(0.9),
-            ]
-          : [AppColors.productsGradientStart, AppColors.productsGradientEnd];
+      gradient =
+          isDark
+              ? [
+                AppColors.productsGradientStart.withOpacity(0.8),
+                AppColors.productsGradientEnd.withOpacity(0.9),
+              ]
+              : [
+                AppColors.productsGradientStart,
+                AppColors.productsGradientEnd,
+              ];
       iconBackgroundColor = AppColors.productsGradientStart.withOpacity(0.2);
       iconColor = AppColors.productsGradientEnd;
     } else if (title.contains('Pedidos')) {
-      gradient = isDark
-          ? [
-              AppColors.ordersGradientStart.withOpacity(0.8),
-              AppColors.ordersGradientEnd.withOpacity(0.9),
-            ]
-          : [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+      gradient =
+          isDark
+              ? [
+                AppColors.ordersGradientStart.withOpacity(0.8),
+                AppColors.ordersGradientEnd.withOpacity(0.9),
+              ]
+              : [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
       iconBackgroundColor = AppColors.ordersGradientStart.withOpacity(0.2);
       iconColor = AppColors.ordersGradientEnd;
     } else if (title.contains('Promociones')) {
-      gradient = isDark
-          ? [
-              const Color(0xFF9C27B0).withOpacity(0.8),
-              const Color(0xFFE91E63).withOpacity(0.9),
-            ]
-          : [const Color(0xFF9C27B0), const Color(0xFFE91E63)];
+      gradient =
+          isDark
+              ? [
+                const Color(0xFF9C27B0).withOpacity(0.8),
+                const Color(0xFFE91E63).withOpacity(0.9),
+              ]
+              : [const Color(0xFF9C27B0), const Color(0xFFE91E63)];
       iconBackgroundColor = const Color(0xFF9C27B0).withOpacity(0.2);
       iconColor = const Color(0xFFE91E63);
     } else {
-      gradient = isDark
-          ? [
-              AppColors.analyticsGradientStart.withOpacity(0.8),
-              AppColors.analyticsGradientEnd.withOpacity(0.9),
-            ]
-          : [AppColors.analyticsGradientStart, AppColors.analyticsGradientEnd];
+      gradient =
+          isDark
+              ? [
+                AppColors.analyticsGradientStart.withOpacity(0.8),
+                AppColors.analyticsGradientEnd.withOpacity(0.9),
+              ]
+              : [
+                AppColors.analyticsGradientStart,
+                AppColors.analyticsGradientEnd,
+              ];
       iconBackgroundColor = AppColors.analyticsGradientStart.withOpacity(0.2);
       iconColor = AppColors.analyticsGradientEnd;
     }
@@ -347,10 +434,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
       shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: gradient[0].withOpacity(0.2),
-          width: 1,
-        ),
+        side: BorderSide(color: gradient[0].withOpacity(0.2), width: 1),
       ),
       child: InkWell(
         onTap: onTap,
@@ -374,11 +458,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: Colors.white,
-                ),
+                child: Icon(icon, size: 32, color: Colors.white),
               ),
               const SizedBox(height: 12),
               Text(
@@ -412,72 +492,184 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   void _showNotificationsDialog() {
     if (!mounted) return;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder:
-          (dialogContext) => AlertDialog(
-            title: Row(
-              children: [
-                Icon(
-                  Icons.notifications_outlined,
-                  color: Theme.of(dialogContext).colorScheme.primary,
+          (dialogContext) => TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 250),
+            tween: Tween(begin: 0.8, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder:
+                (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+            child: AlertDialog(
+              backgroundColor: theme.cardColor,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors:
+                            isDark
+                                ? [
+                                  AppColors.statsGradientDarkStart,
+                                  AppColors.statsGradientDarkEnd,
+                                ]
+                                : [
+                                  AppColors.statsGradientStart,
+                                  AppColors.statsGradientEnd,
+                                ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.notifications_outlined,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Notificaciones',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildNotificationItem(
+                      context: dialogContext,
+                      icon: Icons.shopping_bag_outlined,
+                      title: 'Nuevo pedido recibido',
+                      subtitle: 'Hace 5 minutos',
+                      onTap: () {
+                        Navigator.pop(dialogContext);
+                        if (!mounted) return;
+                        context.push('/commerce-orders');
+                      },
+                    ),
+                    const Divider(height: 24),
+                    _buildNotificationItem(
+                      context: dialogContext,
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Stock bajo en productos',
+                      subtitle: 'Hace 1 hora',
+                      onTap: () {
+                        Navigator.pop(dialogContext);
+                        if (!mounted) return;
+                        context.push('/commerce-products');
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                const Text('Notificaciones'),
+              ),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(
+                      'Cerrar',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView(
-                shrinkWrap: true,
+          ),
+    );
+  }
+
+  Widget _buildNotificationItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color:
+              isDark
+                  ? theme.colorScheme.surfaceVariant.withOpacity(0.3)
+                  : theme.colorScheme.surfaceVariant.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: theme.colorScheme.primary, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        dialogContext,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      child: Icon(
-                        Icons.shopping_bag_outlined,
-                        color: Theme.of(dialogContext).colorScheme.primary,
-                      ),
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
                     ),
-                    title: const Text('Nuevo pedido recibido'),
-                    subtitle: const Text('Hace 5 minutos'),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      if (!mounted) return;
-                      context.push('/commerce-orders');
-                    },
                   ),
-                  const Divider(),
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        dialogContext,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      child: Icon(
-                        Icons.inventory_2_outlined,
-                        color: Theme.of(dialogContext).colorScheme.primary,
-                      ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                    title: const Text('Stock bajo en productos'),
-                    subtitle: const Text('Hace 1 hora'),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      if (!mounted) return;
-                      context.push('/commerce-products');
-                    },
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cerrar'),
-              ),
-            ],
-          ),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
