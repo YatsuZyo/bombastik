@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bombastik/presentation/widgets/gradient_card.dart';
 import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CommerceHomeScreen extends ConsumerStatefulWidget {
   const CommerceHomeScreen({super.key});
@@ -20,6 +22,7 @@ class CommerceHomeScreen extends ConsumerStatefulWidget {
 class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   final _searchController = TextEditingController();
   final bool _isLoading = false;
+  bool _hasUnreadNotifications = true; // Estado temporal para pruebas
 
   @override
   void initState() {
@@ -105,12 +108,81 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.white,
-                ),
-                onPressed: _showNotificationsDialog,
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors:
+                              isDark
+                                  ? [
+                                    AppColors.statsGradientDarkStart
+                                        .withOpacity(0.8),
+                                    AppColors.statsGradientDarkEnd.withOpacity(
+                                      0.9,
+                                    ),
+                                  ]
+                                  : [
+                                    AppColors.statsGradientStart.withOpacity(
+                                      0.8,
+                                    ),
+                                    AppColors.statsGradientEnd.withOpacity(0.9),
+                                  ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.notifications_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _hasUnreadNotifications = false;
+                      });
+                      _showNotificationsDialog();
+                    },
+                  ),
+                  if (_hasUnreadNotifications)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B30),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color:
+                                isDark
+                                    ? AppColors.statsGradientDarkStart
+                                    : AppColors.statsGradientStart,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -167,50 +239,129 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
 
   Widget _buildQuickActions(ThemeData theme) {
     final router = ref.read(appRouterProvider);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Text(
-            'Acciones Rápidas',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors:
+                  isDark
+                      ? [
+                        theme.colorScheme.surface.withOpacity(0.3),
+                        theme.colorScheme.surface.withOpacity(0.1),
+                      ]
+                      : [
+                        const Color(0xFFE0F2F1).withOpacity(0.9),
+                        const Color(0xFFB2DFDB).withOpacity(0.6),
+                        const Color(0xFF80CBC4).withOpacity(0.3),
+                      ],
+              stops: isDark ? [0.0, 1.0] : [0.0, 0.5, 1.0],
             ),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    isDark
+                        ? Colors.black12
+                        : const Color(0xFF80CBC4).withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -15,
+                top: 0,
+                bottom: 0,
+                child: Icon(
+                  Icons.bolt_outlined,
+                  size: 60,
+                  color:
+                      isDark
+                          ? theme.colorScheme.primary
+                          : const Color(0xFF00897B),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Acciones Rápidas',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          isDark
+                              ? theme.colorScheme.onBackground
+                              : const Color(0xFF00897B),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Gestiona tu negocio de manera eficiente',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? theme.colorScheme.onBackground.withOpacity(
+                                  0.7,
+                                )
+                                : const Color(0xFF00897B).withOpacity(0.7),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          children: [
-            _buildQuickActionCard(
-              context,
-              icon: Icons.inventory_2_outlined,
-              title: 'Gestionar Productos',
-              onTap: () => router.push('/commerce-products'),
-            ),
-            _buildQuickActionCard(
-              context,
-              icon: Icons.receipt_long_outlined,
-              title: 'Pedidos',
-              onTap: () => router.push('/commerce-orders'),
-            ),
-            _buildQuickActionCard(
-              context,
-              icon: Icons.analytics_outlined,
-              title: 'Estadísticas',
-              onTap:
-                  () => _showComingSoonSnackbar(
-                    context,
-                    'Estadísticas (próximamente)',
-                  ),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            children: [
+              _buildQuickActionCard(
+                context,
+                icon: Icons.inventory_2_outlined,
+                title: 'Gestionar\nProductos',
+                onTap: () => router.push('/commerce-products'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.receipt_long_outlined,
+                title: 'Ver\nPedidos',
+                onTap: () => router.push('/commerce-orders'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.local_offer_outlined,
+                title: 'Gestionar\nPromociones',
+                onTap: () => router.push('/commerce-promotions'),
+              ),
+              _buildQuickActionCard(
+                context,
+                icon: Icons.analytics_outlined,
+                title: 'Ver\nEstadísticas',
+                onTap: () => router.push('/commerce-stats'),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -227,45 +378,104 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
 
     // Determinar el gradiente según el título
     List<Color> gradient;
+    Color iconBackgroundColor;
+    Color iconColor;
+
     if (title.contains('Productos')) {
-      gradient = [
-        AppColors.productsGradientStart,
-        AppColors.productsGradientEnd,
-      ];
+      gradient =
+          isDark
+              ? [
+                AppColors.productsGradientStart.withOpacity(0.8),
+                AppColors.productsGradientEnd.withOpacity(0.9),
+              ]
+              : [
+                AppColors.productsGradientStart,
+                AppColors.productsGradientEnd,
+              ];
+      iconBackgroundColor = AppColors.productsGradientStart.withOpacity(0.2);
+      iconColor = AppColors.productsGradientEnd;
     } else if (title.contains('Pedidos')) {
-      gradient = [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+      gradient =
+          isDark
+              ? [
+                AppColors.ordersGradientStart.withOpacity(0.8),
+                AppColors.ordersGradientEnd.withOpacity(0.9),
+              ]
+              : [AppColors.ordersGradientStart, AppColors.ordersGradientEnd];
+      iconBackgroundColor = AppColors.ordersGradientStart.withOpacity(0.2);
+      iconColor = AppColors.ordersGradientEnd;
+    } else if (title.contains('Promociones')) {
+      gradient =
+          isDark
+              ? [
+                const Color(0xFF9C27B0).withOpacity(0.8),
+                const Color(0xFFE91E63).withOpacity(0.9),
+              ]
+              : [const Color(0xFF9C27B0), const Color(0xFFE91E63)];
+      iconBackgroundColor = const Color(0xFF9C27B0).withOpacity(0.2);
+      iconColor = const Color(0xFFE91E63);
     } else {
-      gradient = [
-        AppColors.analyticsGradientStart,
-        AppColors.analyticsGradientEnd,
-      ];
+      gradient =
+          isDark
+              ? [
+                AppColors.analyticsGradientStart.withOpacity(0.8),
+                AppColors.analyticsGradientEnd.withOpacity(0.9),
+              ]
+              : [
+                AppColors.analyticsGradientStart,
+                AppColors.analyticsGradientEnd,
+              ];
+      iconBackgroundColor = AppColors.analyticsGradientStart.withOpacity(0.2);
+      iconColor = AppColors.analyticsGradientEnd;
     }
 
-    // Si es modo oscuro, hacer el gradiente más suave
-    if (isDark) {
-      gradient = gradient.map((color) => color.withOpacity(0.7)).toList();
-    }
-
-    return GradientCard(
-      isDarkMode: isDark,
-      customGradient: gradient,
-      onTap: onTap,
-      builder:
-          (iconColor, titleColor, textColor) => Column(
+    return Card(
+      elevation: 4,
+      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: gradient[0].withOpacity(0.2), width: 1),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradient,
+            ),
+          ),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32, color: iconColor),
-              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(icon, size: 32, color: Colors.white),
+              ),
+              const SizedBox(height: 12),
               Text(
                 title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: titleColor,
-                ),
                 textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: 0.2,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
+        ),
+      ),
     );
   }
 
@@ -282,72 +492,184 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   void _showNotificationsDialog() {
     if (!mounted) return;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder:
-          (dialogContext) => AlertDialog(
-            title: Row(
-              children: [
-                Icon(
-                  Icons.notifications_outlined,
-                  color: Theme.of(dialogContext).colorScheme.primary,
+          (dialogContext) => TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 250),
+            tween: Tween(begin: 0.8, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder:
+                (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+            child: AlertDialog(
+              backgroundColor: theme.cardColor,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors:
+                            isDark
+                                ? [
+                                  AppColors.statsGradientDarkStart,
+                                  AppColors.statsGradientDarkEnd,
+                                ]
+                                : [
+                                  AppColors.statsGradientStart,
+                                  AppColors.statsGradientEnd,
+                                ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.notifications_outlined,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Notificaciones',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildNotificationItem(
+                      context: dialogContext,
+                      icon: Icons.shopping_bag_outlined,
+                      title: 'Nuevo pedido recibido',
+                      subtitle: 'Hace 5 minutos',
+                      onTap: () {
+                        Navigator.pop(dialogContext);
+                        if (!mounted) return;
+                        context.push('/commerce-orders');
+                      },
+                    ),
+                    const Divider(height: 24),
+                    _buildNotificationItem(
+                      context: dialogContext,
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Stock bajo en productos',
+                      subtitle: 'Hace 1 hora',
+                      onTap: () {
+                        Navigator.pop(dialogContext);
+                        if (!mounted) return;
+                        context.push('/commerce-products');
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                const Text('Notificaciones'),
+              ),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(
+                      'Cerrar',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView(
-                shrinkWrap: true,
+          ),
+    );
+  }
+
+  Widget _buildNotificationItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color:
+              isDark
+                  ? theme.colorScheme.surfaceVariant.withOpacity(0.3)
+                  : theme.colorScheme.surfaceVariant.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: theme.colorScheme.primary, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        dialogContext,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      child: Icon(
-                        Icons.shopping_bag_outlined,
-                        color: Theme.of(dialogContext).colorScheme.primary,
-                      ),
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
                     ),
-                    title: const Text('Nuevo pedido recibido'),
-                    subtitle: const Text('Hace 5 minutos'),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      if (!mounted) return;
-                      context.push('/commerce-orders');
-                    },
                   ),
-                  const Divider(),
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        dialogContext,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      child: Icon(
-                        Icons.inventory_2_outlined,
-                        color: Theme.of(dialogContext).colorScheme.primary,
-                      ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                    title: const Text('Stock bajo en productos'),
-                    subtitle: const Text('Hace 1 hora'),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      if (!mounted) return;
-                      context.push('/commerce-products');
-                    },
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cerrar'),
-              ),
-            ],
-          ),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -473,25 +795,122 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
   Future<bool> _onWillPop() async {
     if (!mounted) return false;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final shouldPop = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('¿Estás seguro?'),
-            content: const Text('¿Deseas salir de la aplicación?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text('Cancelar'),
+          (dialogContext) => TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 250),
+            tween: Tween(begin: 0.8, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder:
+                (context, scale, child) =>
+                    Transform.scale(scale: scale, child: child),
+            child: AlertDialog(
+              backgroundColor: theme.cardColor,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
               ),
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: const Text('Salir'),
+              icon: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors:
+                        isDark
+                            ? [
+                              AppColors.statsGradientDarkStart,
+                              AppColors.statsGradientDarkEnd,
+                            ]
+                            : [
+                              AppColors.statsGradientStart,
+                              AppColors.statsGradientEnd,
+                            ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.exit_to_app_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
-            ],
+              title: Text(
+                '¿Salir de la Aplicación?',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                'Si sales de la aplicación, tendrás que volver a abrirla para acceder a tu cuenta. ¿Estás seguro?',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: theme.colorScheme.error,
+                      foregroundColor: theme.colorScheme.onError,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop(true);
+                      if (mounted) {
+                        SystemNavigator.pop();
+                      }
+                    },
+                    child: const Text(
+                      'Salir',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
     );
-    return shouldPop ?? false;
+
+    return false;
   }
 
   @override
@@ -499,8 +918,15 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldExit = await _onWillPop();
+        if (shouldExit && mounted) {
+          SystemNavigator.pop();
+        }
+      },
       child: Scaffold(
         appBar: GradientAppBar(
           title: 'Dashboard',

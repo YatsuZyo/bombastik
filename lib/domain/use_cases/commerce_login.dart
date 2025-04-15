@@ -76,4 +76,14 @@ class CommerceLoginController extends StateNotifier<AsyncValue<void>> {
       rethrow;
     }
   }
+
+  Future<void> logout() async {
+    state = const AsyncValue.loading();
+    try {
+      await _authService.signOut();
+      state = const AsyncValue.data(null);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
+  }
 }

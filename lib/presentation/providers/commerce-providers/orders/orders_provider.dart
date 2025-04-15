@@ -12,26 +12,30 @@ final orderRepositoryProvider = Provider<OrderRepository>((ref) {
   );
 });
 
-final ordersStreamProvider = StreamProvider.autoDispose<List<CommerceOrder>>((ref) {
-  final repository = ref.watch(orderRepositoryProvider);
-  final commerceId = ref.watch(currentCommerceIdProvider);
-  
-  if (commerceId == null) return Stream.value([]);
-  
-  return repository.watchOrders(commerceId);
+final ordersStreamProvider = StreamProvider<List<CommerceOrder>>((ref) {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return Stream.value([]);
+
+  return FirebaseFirestore.instance
+      .collection('orders')
+      .where('commerceId', isEqualTo: user.uid)
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => CommerceOrder.fromMap({...doc.data(), 'id': doc.id}))
+          .toList());
 });
 
 // Provider para filtrar pedidos por estado
-final filteredOrdersProvider = Provider.family<List<CommerceOrder>, OrderStatus?>((ref, status) {
-  final ordersAsyncValue = ref.watch(ordersStreamProvider);
+final filteredOrdersProvider = Provider.family<AsyncValue<List<CommerceOrder>>, OrderStatus>((ref, status) {
+  final ordersAsync = ref.watch(ordersStreamProvider);
   
-  return ordersAsyncValue.when(
+  return ordersAsync.when(
     data: (orders) {
-      if (status == null) return orders;
-      return orders.where((order) => order.status == status).toList();
+      final filteredOrders = orders.where((order) => order.status == status).toList();
+      return AsyncValue.data(filteredOrders);
     },
-    loading: () => [],
-    error: (_, __) => [],
+    loading: () => const AsyncValue.loading(),
+    error: (error, stackTrace) => AsyncValue.error(error, stackTrace),
   );
 });
 

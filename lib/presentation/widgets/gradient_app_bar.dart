@@ -7,6 +7,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool automaticallyImplyLeading;
   final Widget? leading;
   final bool isDarkMode;
+  final PreferredSizeWidget? bottom;
 
   const GradientAppBar({
     super.key,
@@ -15,6 +16,7 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading = false,
     this.leading,
     required this.isDarkMode,
+    this.bottom,
   });
 
   @override
@@ -28,13 +30,6 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
               ? [AppColors.statsGradientDarkStart, AppColors.statsGradientDarkEnd]
               : [AppColors.statsGradientStart, AppColors.statsGradientEnd],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: AppBar(
         title: Text(
@@ -50,10 +45,11 @@ class GradientAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        bottom: bottom,
       ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
 } 

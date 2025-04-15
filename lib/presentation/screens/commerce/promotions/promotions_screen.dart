@@ -45,6 +45,10 @@ class _PromotionsScreenState extends ConsumerState<PromotionsScreen> {
       appBar: GradientAppBar(
         title: 'Mis Promociones',
         isDarkMode: isDark,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

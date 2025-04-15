@@ -4,6 +4,9 @@ import 'package:bombastik/domain/models/order.dart';
 import 'package:bombastik/presentation/providers/commerce-providers/orders/orders_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bombastik/presentation/providers/commerce-providers/products/products_provider.dart';
+import 'package:bombastik/presentation/widgets/gradient_app_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -12,7 +15,8 @@ class OrdersScreen extends ConsumerStatefulWidget {
   ConsumerState<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _OrdersScreenState extends ConsumerState<OrdersScreen> with SingleTickerProviderStateMixin {
+class _OrdersScreenState extends ConsumerState<OrdersScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<OrderStatus> _tabs = [
     OrderStatus.pending,
@@ -27,7 +31,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> with SingleTickerPr
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null && mounted) {
@@ -42,74 +46,135 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> with SingleTickerPr
     super.dispose();
   }
 
+  IconData _getStatusIcon(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return Icons.pending_actions;
+      case OrderStatus.accepted:
+        return Icons.thumb_up_outlined;
+      case OrderStatus.preparing:
+        return Icons.restaurant;
+      case OrderStatus.ready:
+        return Icons.check_circle_outline;
+      case OrderStatus.delivering:
+        return Icons.delivery_dining;
+      case OrderStatus.completed:
+        return Icons.done_all;
+      case OrderStatus.cancelled:
+        return Icons.cancel_outlined;
+    }
+  }
+
   String _getStatusText(OrderStatus status) {
     switch (status) {
       case OrderStatus.pending:
-        return 'Pendientes';
+        return 'Pendiente';
       case OrderStatus.accepted:
-        return 'Aceptados';
+        return 'Aceptado';
       case OrderStatus.preparing:
         return 'En Preparación';
       case OrderStatus.ready:
-        return 'Listos';
+        return 'Listo';
       case OrderStatus.delivering:
         return 'En Entrega';
       case OrderStatus.completed:
-        return 'Completados';
+        return 'Completado';
       case OrderStatus.cancelled:
-        return 'Cancelados';
+        return 'Cancelado';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pedidos'),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: _tabs.map((status) {
-            final count = ref.watch(orderCountProvider(status));
-            return Tab(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_getStatusText(status)),
-                  if (count > 0) ...[
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        count.toString(),
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+    return DefaultTabController(
+      length: _tabs.length,
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 48),
+          child: GradientAppBar(
+            title: 'Pedidos',
+            isDarkMode: isDark,
+            automaticallyImplyLeading: true,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(48),
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                indicatorSize: TabBarIndicatorSize.label,
+                dividerColor: Colors.transparent,
+                tabAlignment: TabAlignment.start,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: Colors.white.withOpacity(0.2),
+                ),
+                tabs:
+                    _tabs.map((status) {
+                      final count = ref.watch(orderCountProvider(status));
+                      return Tab(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _getStatusIcon(status),
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _getStatusText(status),
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              if (count > 0) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  child: Text(
+                                    count.toString(),
+                                    style: GoogleFonts.poppins(
+                                      color: theme.colorScheme.primary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ],
+                      );
+                    }).toList(),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white.withOpacity(0.7),
               ),
-            );
-          }).toList(),
-          indicatorColor: theme.colorScheme.onPrimary,
-          labelColor: theme.colorScheme.onPrimary,
-          unselectedLabelColor: theme.colorScheme.onPrimary.withOpacity(0.7),
+            ),
+          ),
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: _tabs.map((status) => _OrderList(status: status)).toList(),
+        body: TabBarView(
+          controller: _tabController,
+          children: _tabs.map((status) => _OrderList(status: status)).toList(),
+        ),
       ),
     );
   }
@@ -123,57 +188,67 @@ class _OrderList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final orders = ref.watch(filteredOrdersProvider(status));
+    final ordersAsync = ref.watch(filteredOrdersProvider(status));
 
-    if (orders.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.receipt_long_outlined,
-              size: 64,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+    return ordersAsync.when(
+      data: (orders) {
+        if (orders.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                      Icons.receipt_long_outlined,
+                      size: 80,
+                      color: theme.colorScheme.primary.withOpacity(0.5),
+                    )
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .shimmer(duration: const Duration(seconds: 2)),
+                const SizedBox(height: 16),
+                Text(
+                  'No hay pedidos ${status == OrderStatus.pending ? "pendientes" : "en esta categoría"}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onBackground.withOpacity(0.7),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'No hay pedidos ${_getStatusText(status).toLowerCase()}',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onBackground.withOpacity(0.6),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+          );
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: orders.length,
-      itemBuilder: (context, index) {
-        final order = orders[index];
-        return _OrderCard(order: order);
+        return RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(ordersStreamProvider);
+          },
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: orders.length,
+            itemBuilder: (context, index) {
+              final order = orders[index];
+              return _OrderCard(order: order)
+                  .animate()
+                  .fadeIn(duration: const Duration(milliseconds: 300))
+                  .slideX(
+                    begin: 0.2,
+                    end: 0,
+                    curve: Curves.easeOutQuad,
+                    duration: const Duration(milliseconds: 300),
+                  );
+            },
+          ),
+        );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error:
+          (error, stack) => Center(
+            child: Text(
+              'Error al cargar los pedidos: $error',
+              style: GoogleFonts.poppins(color: theme.colorScheme.error),
+            ),
+          ),
     );
-  }
-
-  String _getStatusText(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.pending:
-        return 'Pendientes';
-      case OrderStatus.accepted:
-        return 'Aceptados';
-      case OrderStatus.preparing:
-        return 'En Preparación';
-      case OrderStatus.ready:
-        return 'Listos';
-      case OrderStatus.delivering:
-        return 'En Entrega';
-      case OrderStatus.completed:
-        return 'Completados';
-      case OrderStatus.cancelled:
-        return 'Cancelados';
-    }
   }
 }
 
@@ -182,201 +257,488 @@ class _OrderCard extends ConsumerWidget {
 
   const _OrderCard({required this.order});
 
+  String _getStatusText(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return 'Pendiente';
+      case OrderStatus.accepted:
+        return 'Aceptado';
+      case OrderStatus.preparing:
+        return 'En Preparación';
+      case OrderStatus.ready:
+        return 'Listo';
+      case OrderStatus.delivering:
+        return 'En Entrega';
+      case OrderStatus.completed:
+        return 'Completado';
+      case OrderStatus.cancelled:
+        return 'Cancelado';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Encabezado con información del cliente
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            ),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  child: Icon(Icons.person_outline),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.clientName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (order.isDelivery && order.deliveryAddress != null)
-                        Text(
-                          order.deliveryAddress!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onBackground.withOpacity(0.6),
-                          ),
-                        ),
-                    ],
+      elevation: 2,
+      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color:
+              isDark
+                  ? theme.colorScheme.surface
+                  : theme.colorScheme.outline.withOpacity(0.1),
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _showOrderDetails(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Pedido #${order.id.substring(0, 8)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                  _buildStatusChip(context, order.status),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${order.items.length} ${order.items.length == 1 ? "producto" : "productos"}',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total:',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                  Text(
+                    '\$${order.total.toStringAsFixed(2)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              if (order.status == OrderStatus.pending) ...[
+                const SizedBox(height: 16),
+                Row(
                   children: [
-                    Text(
-                      'Total: ${order.total.toStringAsFixed(2)} Bs.',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showRejectDialog(context, ref),
+                        icon: const Icon(Icons.close),
+                        label: const Text('Rechazar'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: theme.colorScheme.error,
+                          side: BorderSide(color: theme.colorScheme.error),
+                        ),
                       ),
                     ),
-                    Text(
-                      '${order.items.length} productos',
-                      style: theme.textTheme.bodySmall,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => _acceptOrder(context, ref),
+                        icon: const Icon(Icons.check),
+                        label: const Text('Aceptar'),
+                      ),
                     ),
                   ],
                 ),
               ],
-            ),
+            ],
           ),
-          // Lista de productos
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: order.items.length,
-            itemBuilder: (context, index) {
-              final item = order.items[index];
-              return ListTile(
-                leading: item.imageUrl != null
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(item.imageUrl!),
-                      )
-                    : const CircleAvatar(
-                        child: Icon(Icons.shopping_bag_outlined),
+        ),
+      ),
+    );
+  }
+
+  void _showOrderDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => Scaffold(
+              appBar: AppBar(title: const Text('Detalles del Pedido')),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildOrderHeader(context),
+                    const SizedBox(height: 24),
+                    _buildOrderItems(context),
+                    const SizedBox(height: 24),
+                    _buildOrderSummary(context),
+                  ],
+                ),
+              ),
+            ),
+      ),
+    );
+  }
+
+  void _showRejectDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Rechazar Pedido'),
+            content: const Text('¿Estás seguro de rechazar este pedido?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  ref
+                      .read(orderRepositoryProvider)
+                      .updateOrderStatus(order.id, OrderStatus.cancelled);
+                  Navigator.pop(context);
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text('Rechazar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _acceptOrder(BuildContext context, WidgetRef ref) {
+    ref
+        .read(orderRepositoryProvider)
+        .updateOrderStatus(order.id, OrderStatus.accepted);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Pedido aceptado correctamente'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  Widget _buildOrderHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Pedido #${order.id.substring(0, 8)}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                _buildStatusChip(context, order.status),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  size: 20,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  order.clientName,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+            if (order.isDelivery && order.deliveryAddress != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 20,
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      order.deliveryAddress!,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
                       ),
-                title: Text(item.name),
-                subtitle: item.notes != null ? Text(item.notes!) : null,
-                trailing: Text(
-                  '${item.quantity}x ${item.price.toStringAsFixed(2)} Bs.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderItems(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Productos',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...order.items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    if (item.imageUrl != null)
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(item.imageUrl!),
+                        radius: 24,
+                      )
+                    else
+                      const CircleAvatar(
+                        child: Icon(Icons.shopping_bag_outlined),
+                        radius: 24,
+                      ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name,
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (item.notes != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              item.notes!,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.7,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '\$${item.price.toStringAsFixed(2)}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        Text(
+                          '${item.quantity}x',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderSummary(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Resumen',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Subtotal',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+                Text(
+                  '\$${order.total.toStringAsFixed(2)}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-              );
-            },
-          ),
-          // Botones de acción
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (order.status == OrderStatus.pending) ...[
-                  OutlinedButton(
-                    onPressed: () => _showCancelDialog(context, ref, order),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.colorScheme.error,
-                    ),
-                    child: const Text('Rechazar'),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: () => _updateOrderStatus(ref, order.id, OrderStatus.accepted),
-                    child: const Text('Aceptar'),
-                  ),
-                ] else if (order.status != OrderStatus.completed && 
-                          order.status != OrderStatus.cancelled) ...[
-                  FilledButton(
-                    onPressed: () => _showNextStatusDialog(context, ref, order),
-                    child: const Text('Actualizar Estado'),
-                  ),
-                ],
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _updateOrderStatus(WidgetRef ref, String orderId, OrderStatus newStatus) {
-    ref.read(orderRepositoryProvider).updateOrderStatus(orderId, newStatus);
-  }
-
-  void _showCancelDialog(BuildContext context, WidgetRef ref, CommerceOrder order) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Rechazar Pedido'),
-        content: Text('¿Estás seguro de rechazar el pedido de ${order.clientName}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              _updateOrderStatus(ref, order.id, OrderStatus.cancelled);
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Envío',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+                Text(
+                  order.isDelivery
+                      ? '\$${order.deliveryFee.toStringAsFixed(2)}'
+                      : 'Gratis',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-            child: const Text('Rechazar'),
-          ),
-        ],
+            const Divider(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '\$${(order.total + (order.isDelivery ? order.deliveryFee : 0)).toStringAsFixed(2)}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _showNextStatusDialog(BuildContext context, WidgetRef ref, CommerceOrder order) {
-    OrderStatus nextStatus;
-    String actionText;
+  Widget _buildStatusChip(BuildContext context, OrderStatus status) {
+    Color chipColor;
+    IconData iconData;
 
-    switch (order.status) {
+    switch (status) {
+      case OrderStatus.pending:
+        chipColor = Colors.orange;
+        iconData = Icons.pending;
+        break;
       case OrderStatus.accepted:
-        nextStatus = OrderStatus.preparing;
-        actionText = 'Comenzar Preparación';
+        chipColor = Colors.blue;
+        iconData = Icons.thumb_up;
         break;
       case OrderStatus.preparing:
-        nextStatus = OrderStatus.ready;
-        actionText = 'Marcar como Listo';
+        chipColor = Colors.amber;
+        iconData = Icons.restaurant;
         break;
       case OrderStatus.ready:
-        nextStatus = order.isDelivery ? OrderStatus.delivering : OrderStatus.completed;
-        actionText = order.isDelivery ? 'Iniciar Entrega' : 'Marcar como Entregado';
+        chipColor = Colors.green;
+        iconData = Icons.check_circle;
         break;
       case OrderStatus.delivering:
-        nextStatus = OrderStatus.completed;
-        actionText = 'Marcar como Entregado';
+        chipColor = Colors.purple;
+        iconData = Icons.delivery_dining;
         break;
-      default:
-        return;
+      case OrderStatus.completed:
+        chipColor = Colors.teal;
+        iconData = Icons.done_all;
+        break;
+      case OrderStatus.cancelled:
+        chipColor = Colors.red;
+        iconData = Icons.cancel;
+        break;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Actualizar Estado'),
-        content: Text('¿Deseas $actionText?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              _updateOrderStatus(ref, order.id, nextStatus);
-              Navigator.pop(context);
-            },
-            child: Text(actionText),
+    return Container(
+      decoration: BoxDecoration(
+        color: chipColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: chipColor.withOpacity(0.5)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(iconData, size: 16, color: chipColor),
+          const SizedBox(width: 6),
+          Text(
+            _getStatusText(status),
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: chipColor,
+            ),
           ),
         ],
       ),
     );
   }
-} 
+}

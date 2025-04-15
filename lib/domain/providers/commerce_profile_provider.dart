@@ -86,11 +86,12 @@ class CommerceProfileController extends _$CommerceProfileController {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .update(updatedProfile.toMap());
+          .set(updatedProfile.toMap(), SetOptions(merge: true));
 
       state = AsyncValue.data(updatedProfile);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
+      throw Exception('Error al actualizar el perfil: ${e.toString()}');
     }
   }
 

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:http/http.dart' as http;
 
 /// Excepción personalizada para errores del servicio ImgBB
 class ImgbbException implements Exception {
@@ -18,63 +20,127 @@ class ImgbbException implements Exception {
 
 /// Servicio para gestionar la subida de imágenes a ImgBB
 class ImgBBService {
+  final String apiKey;
   final Dio _dio;
-  final String _apiKey;
   static const String _baseUrl = 'https://api.imgbb.com/1';
 
-  /// Crea una nueva instancia de ImgbbService
-  ///
-  /// [apiKey] - API key de ImgBB
-  /// [dioOptions] - Opciones de configuración para Dio (opcional)
-  ImgBBService({required String apiKey, BaseOptions? dioOptions})
-    : _apiKey = apiKey,
-      _dio = Dio(
-        dioOptions ??
-            BaseOptions(
-              baseUrl: _baseUrl,
-              connectTimeout: const Duration(seconds: 30),
-              receiveTimeout: const Duration(seconds: 30),
-              validateStatus: (status) => status != null && status < 500,
-            ),
+  ImgBBService({required this.apiKey})
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        ),
       );
 
-  /// Sube una imagen a ImgBB y retorna la URL de la imagen
-  ///
-  /// Throws [ImgbbException] si hay algún error durante la subida
-  Future<String> uploadImage(File imageFile) async {
+  /// Selecciona una imagen del dispositivo
+  Future<File?> pickImage(BuildContext context) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+
+      if (image == null) return null;
+
+      final File originalFile = File(image.path);
+      if (!await validateImage(originalFile)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('La imagen debe ser menor a 5MB'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        return null;
+      }
+
+      final CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 85,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Recortar Logo',
+            toolbarColor: Theme.of(context).colorScheme.primary,
+            toolbarWidgetColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            hideBottomControls: true,
+            lockAspectRatio: true,
+            initAspectRatio: CropAspectRatioPreset.square,
+            cropFrameColor: Theme.of(context).colorScheme.primary,
+            cropGridColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            showCropGrid: false,
+            dimmedLayerColor: Colors.black.withOpacity(0.5),
+            statusBarColor: Theme.of(context).colorScheme.primary,
+          ),
+          IOSUiSettings(
+            title: 'Recortar Logo',
+            doneButtonTitle: 'Aceptar',
+            cancelButtonTitle: 'Cancelar',
+            aspectRatioLockEnabled: true,
+            minimumAspectRatio: 1.0,
+            rotateButtonsHidden: true,
+            resetButtonHidden: true,
+            aspectRatioPickerButtonHidden: true,
+          ),
+        ],
+      );
+
+      if (croppedFile == null) return null;
+
+      final croppedImageFile = File(croppedFile.path);
+      if (!await croppedImageFile.exists()) {
+        throw Exception('El archivo recortado no existe');
+      }
+
+      return croppedImageFile;
+    } catch (e) {
+      debugPrint('Error en pickImage: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al procesar la imagen: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return null;
+    }
+  }
+
+  /// Sube una imagen a ImgBB
+  Future<String?> uploadImage(File imageFile) async {
     try {
       if (!await validateImage(imageFile)) {
-        throw ImgbbException(
-          'La imagen no cumple con los requisitos de validación',
-        );
+        throw Exception('La imagen no cumple con los requisitos de validación');
       }
 
       final bytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
 
-      final formData = FormData.fromMap({'key': _apiKey, 'image': base64Image});
+      final formData = FormData.fromMap({
+        'key': apiKey,
+        'image': base64Image,
+      });
 
       final response = await _dio.post('/upload', data: formData);
 
-      if (response.statusCode != 200) {
-        throw ImgbbException(
-          'Error al subir la imagen: ${response.statusMessage}',
-          response.data,
-        );
-      }
-
-      if (response.data['success'] != true) {
-        throw ImgbbException(
-          'La subida falló: ${response.data['error']?['message'] ?? 'Error desconocido'}',
-          response.data,
+      if (response.statusCode != 200 || response.data['success'] != true) {
+        throw Exception(
+          'Error al subir la imagen: ${response.data['error']?['message'] ?? 'Error desconocido'}',
         );
       }
 
       return response.data['data']['url'] as String;
-    } on DioException catch (e) {
-      throw ImgbbException(_getDioErrorMessage(e), e);
     } catch (e) {
-      throw ImgbbException('Error inesperado al subir la imagen', e);
+      debugPrint('Error en uploadImage: $e');
+      rethrow;
     }
   }
 
@@ -88,79 +154,19 @@ class ImgBBService {
     return await uploadImage(imageFile);
   }
 
-  /// Selecciona una imagen del dispositivo
-  Future<File?> pickImage(
-    BuildContext context, {
-    ImageSource source = ImageSource.gallery,
-    double maxWidth = 1024,
-    double maxHeight = 1024,
-    int imageQuality = 85,
-  }) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: source,
-        maxWidth: maxWidth,
-        maxHeight: maxHeight,
-        imageQuality: imageQuality,
-      );
-
-      if (image == null) return null;
-
-      return File(image.path);
-    } catch (e) {
-      debugPrint('Error al seleccionar imagen: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al seleccionar la imagen')),
-        );
-      }
-      return null;
-    }
-  }
-
   /// Valida que la imagen cumpla con los requisitos
-  Future<bool> validateImage(File? imageFile) async {
-    if (imageFile == null) return false;
-
+  Future<bool> validateImage(File imageFile) async {
     try {
       final bytes = await imageFile.readAsBytes();
-      // Validar tamaño máximo (5MB)
-      if (bytes.length > 5 * 1024 * 1024) {
-        throw ImgbbException('La imagen no debe superar los 5MB');
-      }
-      return true;
+      return bytes.length <= 5 * 1024 * 1024; // 5MB
     } catch (e) {
-      debugPrint('Error al validar imagen: $e');
+      debugPrint('Error en validateImage: $e');
       return false;
     }
   }
 
-  /// Obtiene un mensaje de error amigable basado en el error de Dio
-  String _getDioErrorMessage(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-        return 'Tiempo de conexión agotado';
-      case DioExceptionType.sendTimeout:
-        return 'Tiempo de envío agotado';
-      case DioExceptionType.receiveTimeout:
-        return 'Tiempo de respuesta agotado';
-      case DioExceptionType.badResponse:
-        return 'Error en la respuesta del servidor: ${e.response?.statusMessage}';
-      case DioExceptionType.cancel:
-        return 'La solicitud fue cancelada';
-      default:
-        return 'Error de conexión: ${e.message}';
-    }
-  }
-
   Future<String?> uploadPromotionImage(BuildContext context) async {
-    final image = await pickImage(
-      context,
-      maxWidth: 1200,
-      maxHeight: 800,
-      imageQuality: 85,
-    );
+    final image = await pickImage(context);
 
     if (image == null) return null;
 
