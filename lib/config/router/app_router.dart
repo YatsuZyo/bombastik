@@ -21,6 +21,7 @@ import 'package:bombastik/presentation/screens/commerce/orders/orders_screen.dar
 import 'package:bombastik/presentation/screens/commerce/promotions/promotions_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/profile/commerce_profile_screen.dart';
 import 'package:bombastik/presentation/screens/commerce/commerce_dashboard_screen.dart';
+import 'package:bombastik/presentation/screens/commerce/stats/stats_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -158,6 +159,14 @@ GoRouter appRouter(ref) {
             pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const CommerceHomeScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/commerce-stats',
+            name: 'commerce-stats',
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const StatsScreen(),
             ),
           ),
           GoRoute(
