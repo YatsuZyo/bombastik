@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:bombastik/config/themes/app_theme.dart';
 
 class ProfileOptionCard extends StatelessWidget {
   final IconData icon;
@@ -22,14 +24,33 @@ class ProfileOptionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark 
-              ? theme.colorScheme.surface 
-              : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark 
+                ? [
+                    const Color(0xFF568028),  // Verde oscuro principal
+                    const Color(0xFF2A7654),  // Verde oscuro secundario
+                  ]
+                : [
+                    const Color(0xFF86C144),  // Verde principal
+                    const Color(0xFF42B883),  // Verde secundario
+                  ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark 
+                ? const Color(0xFF86C144).withOpacity(0.1)
+                : const Color(0xFF42B883).withOpacity(0.2),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.1),
+              color: isDark 
+                  ? const Color(0xFF568028).withOpacity(0.3)
+                  : const Color(0xFF86C144).withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -38,23 +59,18 @@ class ProfileOptionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: (iconColor ?? theme.colorScheme.primary).withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: iconColor ?? theme.colorScheme.primary,
-                size: 32,
-              ),
+            Icon(
+              icon,
+              size: 32,
+              color: iconColor ?? Colors.white,
             ),
             const SizedBox(height: 12),
             Text(
               title,
-              style: theme.textTheme.titleMedium?.copyWith(
+              style: GoogleFonts.poppins(
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
             ),

@@ -11,6 +11,7 @@ import 'package:bombastik/presentation/screens/client/profile/profile_option_car
 import 'package:flutter/material.dart';
 import 'package:bombastik/domain/models/user_profile.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -29,70 +30,257 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with AutomaticKee
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? theme.colorScheme.surface : theme.colorScheme.primary,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark 
+              ? [
+                  const Color(0xFF568028),  // Verde oscuro principal
+                  const Color(0xFF2A7654),  // Verde oscuro secundario
+                  const Color(0xFF1E3A4C),  // Azul oscuro para profundidad
+                ]
+              : [
+                  const Color(0xFF86C144),  // Verde principal
+                  const Color(0xFF42B883),  // Verde secundario
+                  const Color(0xFF6EA037),  // Verde más oscuro para profundidad
+                ],
+        ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark 
+                ? const Color(0xFF568028).withOpacity(0.5)
+                : const Color(0xFF86C144).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(
-                height: 48,
-                child: Center(child: ThemeSwitch()),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [
+                            Colors.white.withOpacity(0.2),
+                            Colors.white.withOpacity(0.1),
+                          ]
+                        : [
+                            Colors.white.withOpacity(0.3),
+                            Colors.white.withOpacity(0.2),
+                          ],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const ThemeSwitch(),
               ),
               IconButton(
-                icon: Icon(
-                  Icons.settings_outlined,
-                  color: isDark ? theme.colorScheme.primary : headerTextColor,
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              Colors.white.withOpacity(0.2),
+                              Colors.white.withOpacity(0.1),
+                            ]
+                          : [
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0.2),
+                            ],
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.settings_outlined,
+                    color: Colors.white.withOpacity(0.9),
+                    size: 20,
+                  ),
                 ),
                 onPressed: () => _showComingSoonSnackbar(context, 'Configuración (próximamente)'),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          ProfileAvatar(
-            imageUrl: profile.photoUrl,
-            radius: 50,
-            onImageSelected: (imageFile) async {
-              final notifier = ref.read(profileProvider.notifier);
-              await notifier.uploadImageWithConfirmation(
-                context: context,
-                imageFile: imageFile,
-              );
-            },
+          const SizedBox(height: 24),
+          Stack(
+            children: [
+              ProfileAvatar(
+                imageUrl: profile.photoUrl,
+                radius: 50,
+                onImageSelected: (imageFile) async {
+                  final notifier = ref.read(profileProvider.notifier);
+                  await notifier.uploadImageWithConfirmation(
+                    context: context,
+                    imageFile: imageFile,
+                  );
+                },
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              const Color(0xFFFF9800),
+                              const Color(0xFFF57C00),
+                            ]
+                          : [
+                              const Color(0xFFFFC107),
+                              const Color(0xFFFF9800),
+                            ],
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Text(
             profile.name ?? 'Usuario',
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: GoogleFonts.poppins(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: headerTextColor,
+              color: Colors.white,
             ),
           ),
-          Text(
-            'Cliente',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: headerTextColor.withOpacity(0.7),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => _showEditProfileWithTransition(context, ref, profile),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? theme.colorScheme.primary : headerTextColor,
-              foregroundColor: isDark ? headerTextColor : theme.colorScheme.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        const Color(0xFF86C144).withOpacity(0.2),
+                        const Color(0xFF42B883).withOpacity(0.1),
+                      ]
+                    : [
+                        const Color(0xFF86C144).withOpacity(0.3),
+                        const Color(0xFF42B883).withOpacity(0.2),
+                      ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF86C144).withOpacity(0.3)
+                    : const Color(0xFF42B883).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Text(
-              'Editar Perfil',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              'Cliente',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.white.withOpacity(0.9),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () => _showEditProfileWithTransition(context, ref, profile),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF86C144),
+                          const Color(0xFF42B883),
+                        ]
+                      : [
+                          const Color(0xFF86C144),
+                          const Color(0xFF42B883),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark
+                        ? const Color(0xFF86C144).withOpacity(0.4)
+                        : const Color(0xFF42B883).withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Editar Perfil',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.edit_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ],
               ),
             ),
           ),
