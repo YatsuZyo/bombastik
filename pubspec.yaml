@@ -63,6 +63,8 @@ flutter:
     - assets/images/BombastikLogoDarkMode.png
     - assets/images/background_image_loginDarkMode.png
     - assets/images/In no time-amico.svg
+    - assets/images/mobile_register2_pana.svg
+    - assets/images/loginamico.svg
   uses-material-design: true
   #fonts:
   # - family: Inter
