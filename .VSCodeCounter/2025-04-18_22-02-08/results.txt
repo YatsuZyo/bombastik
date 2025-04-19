@@ -1,0 +1,281 @@
+Date : 2025-04-18 22:02:08
+Directory : c:\Users\jorge\Desktop\Proyectos Flutter\bombastik
+Total : 149 files,  19033 codes, 514 comments, 1373 blanks, all 20920 lines
+
+Languages
++-----------------+------------+------------+------------+------------+------------+
+| language        | files      | code       | comment    | blank      | total      |
++-----------------+------------+------------+------------+------------+------------+
+| Dart            |        100 |     17,543 |        291 |      1,130 |     18,964 |
+| C++             |         16 |        559 |        131 |        189 |        879 |
+| XML             |         13 |        477 |         53 |         12 |        542 |
+| JSON            |          6 |        278 |          0 |          4 |        282 |
+| Swift           |          6 |         71 |          7 |         21 |         99 |
+| YAML            |          2 |         68 |         17 |          6 |         91 |
+| HTML            |          1 |         19 |         15 |          5 |         39 |
+| Java Properties |          2 |          8 |          0 |          2 |         10 |
+| Markdown        |          2 |          5 |          0 |          4 |          9 |
+| Properties      |          1 |          5 |          0 |          0 |          5 |
++-----------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                                   | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                                      |        149 |     19,033 |        514 |      1,373 |     20,920 |
+| . (Files)                                                                                                                              |          5 |         76 |         17 |          8 |        101 |
+| android                                                                                                                                |         10 |        107 |         51 |         11 |        169 |
+| android (Files)                                                                                                                        |          1 |          3 |          0 |          1 |          4 |
+| android\app                                                                                                                            |          8 |         99 |         51 |          9 |        159 |
+| android\app (Files)                                                                                                                    |          1 |         29 |          0 |          0 |         29 |
+| android\app\src                                                                                                                        |          7 |         70 |         51 |          9 |        130 |
+| android\app\src\debug                                                                                                                  |          1 |          3 |          4 |          1 |          8 |
+| android\app\src\main                                                                                                                   |          5 |         64 |         43 |          7 |        114 |
+| android\app\src\main (Files)                                                                                                           |          1 |         38 |         11 |          1 |         50 |
+| android\app\src\main\res                                                                                                               |          4 |         26 |         32 |          6 |         64 |
+| android\app\src\main\res\drawable                                                                                                      |          1 |          4 |          7 |          2 |         13 |
+| android\app\src\main\res\drawable-v21                                                                                                  |          1 |          4 |          7 |          2 |         13 |
+| android\app\src\main\res\values                                                                                                        |          1 |          9 |          9 |          1 |         19 |
+| android\app\src\main\res\values-night                                                                                                  |          1 |          9 |          9 |          1 |         19 |
+| android\app\src\profile                                                                                                                |          1 |          3 |          4 |          1 |          8 |
+| android\gradle                                                                                                                         |          1 |          5 |          0 |          1 |          6 |
+| android\gradle\wrapper                                                                                                                 |          1 |          5 |          0 |          1 |          6 |
+| assets                                                                                                                                 |          3 |          3 |          0 |          0 |          3 |
+| assets\images                                                                                                                          |          3 |          3 |          0 |          0 |          3 |
+| ios                                                                                                                                    |          8 |        229 |          4 |         13 |        246 |
+| ios\Runner                                                                                                                             |          7 |        222 |          2 |          9 |        233 |
+| ios\Runner (Files)                                                                                                                     |          2 |         13 |          0 |          3 |         16 |
+| ios\RunnerTests                                                                                                                        |          1 |          7 |          2 |          4 |         13 |
+| ios\Runner\Assets.xcassets                                                                                                             |          3 |        148 |          0 |          4 |        152 |
+| ios\Runner\Assets.xcassets\AppIcon.appiconset                                                                                          |          1 |        122 |          0 |          1 |        123 |
+| ios\Runner\Assets.xcassets\LaunchImage.imageset                                                                                        |          2 |         26 |          0 |          3 |         29 |
+| ios\Runner\Base.lproj                                                                                                                  |          2 |         61 |          2 |          2 |         65 |
+| lib                                                                                                                                    |         99 |     17,529 |        281 |      1,123 |     18,933 |
+| lib (Files)                                                                                                                            |          1 |         50 |          0 |          9 |         59 |
+| lib\config                                                                                                                             |          6 |        575 |         48 |         42 |        665 |
+| lib\config (Files)                                                                                                                     |          3 |         95 |         22 |         12 |        129 |
+| lib\config\router                                                                                                                      |          2 |        227 |         14 |          9 |        250 |
+| lib\config\themes                                                                                                                      |          1 |        253 |         12 |         21 |        286 |
+| lib\domain                                                                                                                             |         22 |      2,042 |         38 |        262 |      2,342 |
+| lib\domain\models                                                                                                                      |          9 |        965 |         12 |         80 |      1,057 |
+| lib\domain\providers                                                                                                                   |          2 |        124 |          8 |         28 |        160 |
+| lib\domain\repositories                                                                                                                |          8 |        765 |         13 |        122 |        900 |
+| lib\domain\use_cases                                                                                                                   |          3 |        188 |          5 |         32 |        225 |
+| lib\infrastructure                                                                                                                     |          6 |        341 |         30 |         64 |        435 |
+| lib\infrastructure\services                                                                                                            |          6 |        341 |         30 |         64 |        435 |
+| lib\presentation                                                                                                                       |         64 |     14,521 |        165 |        746 |     15,432 |
+| lib\presentation\providers                                                                                                             |         18 |      1,074 |         63 |        191 |      1,328 |
+| lib\presentation\providers (Files)                                                                                                     |          1 |         73 |          6 |         15 |         94 |
+| lib\presentation\providers\client-providers                                                                                            |         12 |        650 |         36 |        114 |        800 |
+| lib\presentation\providers\client-providers (Files)                                                                                    |          3 |         41 |         11 |         15 |         67 |
+| lib\presentation\providers\client-providers\cart                                                                                       |          1 |         60 |          1 |         13 |         74 |
+| lib\presentation\providers\client-providers\chat                                                                                       |          1 |         52 |          6 |         10 |         68 |
+| lib\presentation\providers\client-providers\components                                                                                 |          1 |         46 |          3 |          9 |         58 |
+| lib\presentation\providers\client-providers\dashboard                                                                                  |          1 |         67 |          1 |          9 |         77 |
+| lib\presentation\providers\client-providers\favorites                                                                                  |          1 |         24 |          1 |          6 |         31 |
+| lib\presentation\providers\client-providers\home                                                                                       |          2 |        196 |          6 |         30 |        232 |
+| lib\presentation\providers\client-providers\profile                                                                                    |          2 |        164 |          7 |         22 |        193 |
+| lib\presentation\providers\commerce-providers                                                                                          |          4 |        351 |         21 |         61 |        433 |
+| lib\presentation\providers\commerce-providers\orders                                                                                   |          1 |         42 |          2 |          7 |         51 |
+| lib\presentation\providers\commerce-providers\products                                                                                 |          1 |        113 |          4 |         21 |        138 |
+| lib\presentation\providers\commerce-providers\promotions                                                                               |          1 |        118 |          5 |         20 |        143 |
+| lib\presentation\providers\commerce-providers\stats                                                                                    |          1 |         78 |         10 |         13 |        101 |
+| lib\presentation\providers\commerce_providers                                                                                          |          1 |          0 |          0 |          1 |          1 |
+| lib\presentation\providers\commerce_providers\auth                                                                                     |          1 |          0 |          0 |          1 |          1 |
+| lib\presentation\screens                                                                                                               |         39 |     13,087 |        101 |        530 |     13,718 |
+| lib\presentation\screens (Files)                                                                                                       |          2 |        288 |          4 |         20 |        312 |
+| lib\presentation\screens\client                                                                                                        |         23 |      5,020 |         54 |        237 |      5,311 |
+| lib\presentation\screens\client (Files)                                                                                                |          4 |      1,534 |         25 |         82 |      1,641 |
+| lib\presentation\screens\client\cart                                                                                                   |          1 |        318 |          1 |         11 |        330 |
+| lib\presentation\screens\client\chat                                                                                                   |          2 |        366 |          2 |         15 |        383 |
+| lib\presentation\screens\client\client_dashboard                                                                                       |          1 |         63 |          1 |         11 |         75 |
+| lib\presentation\screens\client\components                                                                                             |          5 |        737 |         11 |         26 |        774 |
+| lib\presentation\screens\client\components (Files)                                                                                     |          4 |        423 |          7 |         22 |        452 |
+| lib\presentation\screens\client\components\dialogs                                                                                     |          1 |        314 |          4 |          4 |        322 |
+| lib\presentation\screens\client\favorites                                                                                              |          1 |        170 |          2 |         10 |        182 |
+| lib\presentation\screens\client\home                                                                                                   |          6 |      1,254 |          9 |         52 |      1,315 |
+| lib\presentation\screens\client\home (Files)                                                                                           |          1 |        314 |          3 |         16 |        333 |
+| lib\presentation\screens\client\home\components                                                                                        |          5 |        940 |          6 |         36 |        982 |
+| lib\presentation\screens\client\profile                                                                                                |          3 |        578 |          3 |         30 |        611 |
+| lib\presentation\screens\commerce                                                                                                      |         14 |      7,779 |         43 |        273 |      8,095 |
+| lib\presentation\screens\commerce (Files)                                                                                              |          4 |      2,159 |         27 |         96 |      2,282 |
+| lib\presentation\screens\commerce\components                                                                                           |          3 |        197 |          1 |          9 |        207 |
+| lib\presentation\screens\commerce\orders                                                                                               |          1 |        715 |          0 |         30 |        745 |
+| lib\presentation\screens\commerce\products                                                                                             |          2 |      1,377 |          5 |         41 |      1,423 |
+| lib\presentation\screens\commerce\profile                                                                                              |          1 |        844 |          2 |         19 |        865 |
+| lib\presentation\screens\commerce\promotions                                                                                           |          2 |      1,478 |          7 |         55 |      1,540 |
+| lib\presentation\screens\commerce\stats                                                                                                |          1 |      1,009 |          1 |         23 |      1,033 |
+| lib\presentation\widgets                                                                                                               |          7 |        360 |          1 |         25 |        386 |
+| linux                                                                                                                                  |          5 |        107 |         37 |         45 |        189 |
+| linux\flutter                                                                                                                          |          2 |         12 |          9 |         11 |         32 |
+| linux\runner                                                                                                                           |          3 |         95 |         28 |         34 |        157 |
+| macos                                                                                                                                  |          6 |        463 |          5 |         17 |        485 |
+| macos\Flutter                                                                                                                          |          1 |         22 |          3 |          4 |         29 |
+| macos\Runner                                                                                                                           |          4 |        434 |          0 |          9 |        443 |
+| macos\Runner (Files)                                                                                                                   |          2 |         23 |          0 |          7 |         30 |
+| macos\RunnerTests                                                                                                                      |          1 |          7 |          2 |          4 |         13 |
+| macos\Runner\Assets.xcassets                                                                                                           |          1 |         68 |          0 |          1 |         69 |
+| macos\Runner\Assets.xcassets\AppIcon.appiconset                                                                                        |          1 |         68 |          0 |          1 |         69 |
+| macos\Runner\Base.lproj                                                                                                                |          1 |        343 |          0 |          1 |        344 |
+| test                                                                                                                                   |          1 |         14 |         10 |          7 |         31 |
+| web                                                                                                                                    |          2 |         54 |         15 |          6 |         75 |
+| windows                                                                                                                                |         10 |        451 |         94 |        143 |        688 |
+| windows\flutter                                                                                                                        |          2 |         23 |          9 |         11 |         43 |
+| windows\runner                                                                                                                         |          8 |        428 |         85 |        132 |        645 |
++----------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------+------------+------------+------------+
+| filename                                                                                                                               | language        | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------+------------+------------+------------+
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\.env                                                                                | Properties      |          5 |          0 |          0 |          5 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\README.md                                                                           | Markdown        |          2 |          0 |          2 |          4 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\analysis_options.yaml                                                               | YAML            |          4 |          0 |          1 |          5 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\google-services.json                                                    | JSON            |         29 |          0 |          0 |         29 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\debug\AndroidManifest.xml                                           | XML             |          3 |          4 |          1 |          8 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\main\AndroidManifest.xml                                            | XML             |         38 |         11 |          1 |         50 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\main\res\drawable-v21\launch_background.xml                         | XML             |          4 |          7 |          2 |         13 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\main\res\drawable\launch_background.xml                             | XML             |          4 |          7 |          2 |         13 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\main\res\values-night\styles.xml                                    | XML             |          9 |          9 |          1 |         19 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\main\res\values\styles.xml                                          | XML             |          9 |          9 |          1 |         19 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\app\src\profile\AndroidManifest.xml                                         | XML             |          3 |          4 |          1 |          8 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\gradle.properties                                                           | Java Properties |          3 |          0 |          1 |          4 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\android\gradle\wrapper\gradle-wrapper.properties                                    | Java Properties |          5 |          0 |          1 |          6 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\assets\images\In no time-amico.svg                                                  | XML             |          1 |          0 |          0 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\assets\images\loginamico.svg                                                        | XML             |          1 |          0 |          0 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\assets\images\mobile_register2_pana.svg                                             | XML             |          1 |          0 |          0 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\firebase.json                                                                       | JSON            |          1 |          0 |          0 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\RunnerTests\RunnerTests.swift                                                   | Swift           |          7 |          2 |          4 |         13 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\AppDelegate.swift                                                        | Swift           |         12 |          0 |          2 |         14 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json                         | JSON            |        122 |          0 |          1 |        123 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Assets.xcassets\LaunchImage.imageset\Contents.json                       | JSON            |         23 |          0 |          1 |         24 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Assets.xcassets\LaunchImage.imageset\README.md                           | Markdown        |          3 |          0 |          2 |          5 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Base.lproj\LaunchScreen.storyboard                                       | XML             |         36 |          1 |          1 |         38 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Base.lproj\Main.storyboard                                               | XML             |         25 |          1 |          1 |         27 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\ios\Runner\Runner-Bridging-Header.h                                                 | C++             |          1 |          0 |          1 |          2 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\api_keys.dart                                                            | Dart            |          3 |          0 |          0 |          3 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\firebase_options.dart                                                    | Dart            |         70 |         12 |          7 |         89 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\router\app_router.dart                                                   | Dart            |        214 |          6 |          3 |        223 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\router\app_router.g.dart                                                 | Dart            |         13 |          8 |          6 |         27 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\secure_config.dart                                                       | Dart            |         22 |         10 |          5 |         37 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\config\themes\app_theme.dart                                                    | Dart            |        253 |         12 |         21 |        286 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\chat_message.dart                                                 | Dart            |         49 |          0 |          7 |         56 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\commerce.dart                                                     | Dart            |         92 |          0 |          5 |         97 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\commerce_profile.dart                                             | Dart            |        124 |          4 |         11 |        139 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\commerce_stats.dart                                               | Dart            |        121 |          0 |         11 |        132 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\order.dart                                                        | Dart            |        164 |          0 |         11 |        175 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\product.dart                                                      | Dart            |        125 |          0 |          7 |        132 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\products_state.dart                                               | Dart            |         30 |          0 |          4 |         34 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\promotion.dart                                                    | Dart            |        181 |          5 |         16 |        202 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\models\user_profile.dart                                                 | Dart            |         79 |          3 |          8 |         90 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\providers\commerce_profile_provider.dart                                 | Dart            |        105 |          1 |         22 |        128 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\providers\commerce_profile_provider.g.dart                               | Dart            |         19 |          7 |          6 |         32 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\commerce_repository.dart                                    | Dart            |         41 |          0 |          7 |         48 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\order_repository.dart                                       | Dart            |         97 |          2 |         15 |        114 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\product_repository.dart                                     | Dart            |        132 |          0 |         18 |        150 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\profile_repository.dart                                     | Dart            |          5 |          0 |          2 |          7 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\profile_repository_impl.dart                                | Dart            |         21 |          0 |          5 |         26 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\promotion_repository.dart                                   | Dart            |        218 |          6 |         33 |        257 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\stats_repository.dart                                       | Dart            |        207 |          4 |         33 |        244 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\repositories\user_repository.dart                                        | Dart            |         44 |          1 |          9 |         54 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\use_cases\client_login.dart                                              | Dart            |         50 |          1 |          7 |         58 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\use_cases\commerce_login.dart                                            | Dart            |         73 |          4 |         13 |         90 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\domain\use_cases\product_controller.dart                                        | Dart            |         65 |          0 |         12 |         77 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\auth_service.dart                                       | Dart            |         82 |         10 |         15 |        107 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\email_service.dart                                      | Dart            |         14 |          7 |          5 |         26 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\firestore_service.dart                                  | Dart            |         21 |          1 |          5 |         27 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\gemini_service.dart                                     | Dart            |         59 |          0 |          8 |         67 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\imgbb_service.dart                                      | Dart            |        144 |          7 |         25 |        176 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\infrastructure\services\local_storage_service.dart                              | Dart            |         21 |          5 |          6 |         32 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\main.dart                                                                       | Dart            |         50 |          0 |          9 |         59 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\auth_provider.dart                      | Dart            |          5 |          1 |          2 |          8 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\cart\cart_provider.dart                 | Dart            |         60 |          1 |         13 |         74 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\chat\chat_provider.dart                 | Dart            |         52 |          6 |         10 |         68 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\client_dashboard_provider.dart          | Dart            |         34 |          9 |         11 |         54 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\components\theme_provider.dart          | Dart            |         46 |          3 |          9 |         58 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\dashboard\dashboard_index_provider.dart | Dart            |         67 |          1 |          9 |         77 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\exit_provider.dart                      | Dart            |          2 |          1 |          2 |          5 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\favorites\favorites_provider.dart       | Dart            |         24 |          1 |          6 |         31 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\home\commerce_provider.dart             | Dart            |         39 |          0 |          6 |         45 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\home\home_provider.dart                 | Dart            |        157 |          6 |         24 |        187 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\profile\imgbb_service_provider.dart     | Dart            |         17 |          0 |          3 |         20 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\client-providers\profile\profile_provider.dart           | Dart            |        147 |          7 |         19 |        173 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\commerce-providers\orders\orders_provider.dart           | Dart            |         42 |          2 |          7 |         51 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\commerce-providers\products\products_provider.dart       | Dart            |        113 |          4 |         21 |        138 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\commerce-providers\promotions\promotions_provider.dart   | Dart            |        118 |          5 |         20 |        143 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\commerce-providers\stats\stats_provider.dart             | Dart            |         78 |         10 |         13 |        101 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\commerce_providers\auth\commerce_auth_provider.dart      | Dart            |          0 |          0 |          1 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\providers\products_provider.dart                                   | Dart            |         73 |          6 |         15 |         94 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\cart\cart_screen.dart                               | Dart            |        318 |          1 |         11 |        330 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\chat\chat_detail_screen.dart                        | Dart            |          0 |          0 |          1 |          1 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\chat\chat_screen.dart                               | Dart            |        366 |          2 |         14 |        382 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\client_dashboard\client_dashboard_screen.dart       | Dart            |         63 |          1 |         11 |         75 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\client_login_screen.dart                            | Dart            |        532 |         12 |         32 |        576 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\client_onboarding_start_screen.dart                 | Dart            |        285 |          1 |         12 |        298 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\client_signin_screen.dart                           | Dart            |        513 |          9 |         25 |        547 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\client_start_screen.dart                            | Dart            |        204 |          3 |         13 |        220 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\components\custom_bottom_navbar.dart                | Dart            |        203 |          1 |          9 |        213 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\components\dialogs\show_edit_profile_dialog.dart    | Dart            |        314 |          4 |          4 |        322 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\components\exit_confirmation_dialog.dart            | Dart            |         72 |          1 |          5 |         78 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\components\show_logout_confirmation.dart            | Dart            |         47 |          2 |          3 |         52 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\components\theme_switch.dart                        | Dart            |        101 |          3 |          5 |        109 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\favorites\favorites_screen.dart                     | Dart            |        170 |          2 |         10 |        182 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\components\category_grid.dart                  | Dart            |        140 |          1 |          4 |        145 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\components\commerce_card.dart                  | Dart            |        204 |          3 |          4 |        211 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\components\commerce_list.dart                  | Dart            |        184 |          2 |          8 |        194 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\components\commerce_search_bar.dart            | Dart            |        206 |          0 |         10 |        216 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\components\search_bar.dart                     | Dart            |        206 |          0 |         10 |        216 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\home\home_screen.dart                               | Dart            |        314 |          3 |         16 |        333 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\profile\profile_avatar.dart                         | Dart            |         83 |          1 |          9 |         93 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\profile\profile_option_card.dart                    | Dart            |         78 |          0 |          4 |         82 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\client\profile\profile_screen.dart                         | Dart            |        417 |          2 |         17 |        436 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\commerce_dashboard_screen.dart                    | Dart            |        208 |          3 |         14 |        225 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\commerce_home_screen.dart                         | Dart            |        957 |          3 |         33 |        993 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\commerce_login.dart                               | Dart            |        428 |          9 |         14 |        451 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\commerce_signin_screen.dart                       | Dart            |        566 |         12 |         35 |        613 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\components\exit_confirmation_dialog.dart          | Dart            |         62 |          1 |          4 |         67 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\components\show_exit_confirmation.dart            | Dart            |         21 |          0 |          2 |         23 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\components\show_logout_confirmation.dart          | Dart            |        114 |          0 |          3 |        117 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\orders\orders_screen.dart                         | Dart            |        715 |          0 |         30 |        745 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\products\product_form_dialog.dart                 | Dart            |        590 |          2 |         20 |        612 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\products\products_screen.dart                     | Dart            |        787 |          3 |         21 |        811 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\profile\commerce_profile_screen.dart              | Dart            |        844 |          2 |         19 |        865 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\promotions\promotion_form_dialog.dart             | Dart            |        619 |          3 |         21 |        643 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\promotions\promotions_screen.dart                 | Dart            |        859 |          4 |         34 |        897 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\commerce\stats\stats_screen.dart                           | Dart            |      1,009 |          1 |         23 |      1,033 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\mode_selector_screen.dart                                  | Dart            |        208 |          2 |          8 |        218 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\screens\splash_screen.dart                                         | Dart            |         80 |          2 |         12 |         94 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\custom_password_field.dart                                 | Dart            |         52 |          1 |          4 |         57 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\custom_text_field.dart                                     | Dart            |         83 |          0 |          4 |         87 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\gradient_app_bar.dart                                      | Dart            |         51 |          0 |          4 |         55 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\gradient_bottom_bar.dart                                   | Dart            |         56 |          0 |          3 |         59 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\gradient_card.dart                                         | Dart            |         63 |          0 |          5 |         68 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\gradient_sliver_app_bar.dart                               | Dart            |         55 |          0 |          3 |         58 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\lib\presentation\widgets\widgets_methods.dart                                       | Dart            |          0 |          0 |          2 |          2 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\linux\flutter\generated_plugin_registrant.cc                                        | C++             |          7 |          4 |          5 |         16 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\linux\flutter\generated_plugin_registrant.h                                         | C++             |          5 |          5 |          6 |         16 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\linux\runner\main.cc                                                                | C++             |          5 |          0 |          2 |          7 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\linux\runner\my_application.cc                                                      | C++             |         83 |         21 |         27 |        131 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\linux\runner\my_application.h                                                       | C++             |          7 |          7 |          5 |         19 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\Flutter\GeneratedPluginRegistrant.swift                                       | Swift           |         22 |          3 |          4 |         29 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\RunnerTests\RunnerTests.swift                                                 | Swift           |          7 |          2 |          4 |         13 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\Runner\AppDelegate.swift                                                      | Swift           |         11 |          0 |          3 |         14 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json                       | JSON            |         68 |          0 |          1 |         69 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\Runner\Base.lproj\MainMenu.xib                                                | XML             |        343 |          0 |          1 |        344 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\macos\Runner\MainFlutterWindow.swift                                                | Swift           |         12 |          0 |          4 |         16 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\pubspec.yaml                                                                        | YAML            |         64 |         17 |          5 |         86 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\test\widget_test.dart                                                               | Dart            |         14 |         10 |          7 |         31 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\web\index.html                                                                      | HTML            |         19 |         15 |          5 |         39 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\web\manifest.json                                                                   | JSON            |         35 |          0 |          1 |         36 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\flutter\generated_plugin_registrant.cc                                      | C++             |         18 |          4 |          5 |         27 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\flutter\generated_plugin_registrant.h                                       | C++             |          5 |          5 |          6 |         16 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\flutter_window.cpp                                                   | C++             |         49 |          7 |         16 |         72 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\flutter_window.h                                                     | C++             |         20 |          5 |          9 |         34 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\main.cpp                                                             | C++             |         30 |          4 |         10 |         44 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\resource.h                                                           | C++             |          9 |          6 |          2 |         17 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\utils.cpp                                                            | C++             |         54 |          2 |         10 |         66 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\utils.h                                                              | C++             |          8 |          6 |          6 |         20 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\win32_window.cpp                                                     | C++             |        210 |         24 |         55 |        289 |
+| c:\Users\jorge\Desktop\Proyectos Flutter\bombastik\windows\runner\win32_window.h                                                       | C++             |         48 |         31 |         24 |        103 |
+| Total                                                                                                                                  |                 |     19,033 |        514 |      1,373 |     20,920 |
++----------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------+------------+------------+------------+
