@@ -31,7 +31,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null && mounted) {
@@ -101,8 +101,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: TabBar(
-                controller: _tabController,
-                isScrollable: true,
+          controller: _tabController,
+          isScrollable: true,
                 indicatorSize: TabBarIndicatorSize.label,
                 dividerColor: Colors.transparent,
                 tabAlignment: TabAlignment.start,
@@ -112,8 +112,8 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                 ),
                 tabs:
                     _tabs.map((status) {
-                      final count = ref.watch(orderCountProvider(status));
-                      return Tab(
+            final count = ref.watch(orderCountProvider(status));
+            return Tab(
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
@@ -122,9 +122,9 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                             horizontal: 16,
                             vertical: 8,
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                               Icon(
                                 _getStatusIcon(status),
                                 size: 20,
@@ -139,41 +139,41 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen>
                                   color: Colors.white,
                                 ),
                               ),
-                              if (count > 0) ...[
+                  if (count > 0) ...[
                                 const SizedBox(width: 8),
-                                Container(
-                                  decoration: BoxDecoration(
+                    Container(
+                      decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8,
                                     vertical: 2,
-                                  ),
-                                  child: Text(
-                                    count.toString(),
+                      ),
+                      child: Text(
+                        count.toString(),
                                     style: GoogleFonts.poppins(
-                                      color: theme.colorScheme.primary,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                          color: theme.colorScheme.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ),
+                  ],
+                ],
+                          ),
+              ),
+            );
+          }).toList(),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white.withOpacity(0.7),
               ),
             ),
           ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: _tabs.map((status) => _OrderList(status: status)).toList(),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: _tabs.map((status) => _OrderList(status: status)).toList(),
         ),
       ),
     );
@@ -192,41 +192,41 @@ class _OrderList extends ConsumerWidget {
 
     return ordersAsync.when(
       data: (orders) {
-        if (orders.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                      Icons.receipt_long_outlined,
+    if (orders.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
                       size: 80,
-                      color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withOpacity(0.5),
                     )
                     .animate(onPlay: (controller) => controller.repeat())
                     .shimmer(duration: const Duration(seconds: 2)),
-                const SizedBox(height: 16),
-                Text(
+            const SizedBox(height: 16),
+            Text(
                   'No hay pedidos ${status == OrderStatus.pending ? "pendientes" : "en esta categoría"}',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: theme.colorScheme.onBackground.withOpacity(0.7),
-                  ),
-                ),
-              ],
+              ),
             ),
-          );
-        }
+          ],
+        ),
+      );
+    }
 
         return RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(ordersStreamProvider);
           },
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              final order = orders[index];
+      padding: const EdgeInsets.all(16),
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        final order = orders[index];
               return _OrderCard(order: order)
                   .animate()
                   .fadeIn(duration: const Duration(milliseconds: 300))
@@ -299,8 +299,8 @@ class _OrderCard extends ConsumerWidget {
         onTap: () => _showOrderDetails(context),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -326,24 +326,24 @@ class _OrderCard extends ConsumerWidget {
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+                    children: [
+                      Text(
                     'Total:',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: theme.colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
-                  Text(
+                        Text(
                     '\$${order.total.toStringAsFixed(2)}',
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.primary,
-                    ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
               if (order.status == OrderStatus.pending) ...[
                 const SizedBox(height: 16),
                 Row(
@@ -372,9 +372,9 @@ class _OrderCard extends ConsumerWidget {
               ],
             ],
           ),
-        ),
-      ),
-    );
+                  ),
+                ),
+              );
   }
 
   void _showOrderDetails(BuildContext context) {
@@ -385,18 +385,18 @@ class _OrderCard extends ConsumerWidget {
             (context) => Scaffold(
               appBar: AppBar(title: const Text('Detalles del Pedido')),
               body: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              children: [
                     _buildOrderHeader(context),
                     const SizedBox(height: 24),
                     _buildOrderItems(context),
                     const SizedBox(height: 24),
                     _buildOrderSummary(context),
-                  ],
-                ),
-              ),
+              ],
+            ),
+          ),
             ),
       ),
     );
@@ -407,27 +407,27 @@ class _OrderCard extends ConsumerWidget {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Rechazar Pedido'),
+        title: const Text('Rechazar Pedido'),
             content: const Text('¿Estás seguro de rechazar este pedido?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
               FilledButton(
-                onPressed: () {
+            onPressed: () {
                   ref
                       .read(orderRepositoryProvider)
                       .updateOrderStatus(order.id, OrderStatus.cancelled);
-                  Navigator.pop(context);
-                },
+              Navigator.pop(context);
+            },
                 style: FilledButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: const Text('Rechazar'),
-              ),
-            ],
+            ),
+            child: const Text('Rechazar'),
           ),
+        ],
+      ),
     );
   }
 
@@ -741,4 +741,4 @@ class _OrderCard extends ConsumerWidget {
       ),
     );
   }
-}
+} 

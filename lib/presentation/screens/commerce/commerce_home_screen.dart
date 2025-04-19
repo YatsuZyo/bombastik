@@ -81,9 +81,9 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                       profileAsync.maybeWhen(
                         data:
                             (profile) =>
@@ -92,25 +92,25 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                                     : '¡Hola, Comercio!',
                         orElse: () => '¡Hola, Comercio!',
                       ),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                       overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '¡Bienvenido a tu dashboard!',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.8),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '¡Bienvenido a tu dashboard!',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               ),
               Stack(
                 children: [
-                  IconButton(
+              IconButton(
                     icon: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -143,8 +143,8 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                         ],
                       ),
                       child: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
+                  Icons.notifications_outlined,
+                  color: Colors.white,
                         size: 24,
                       ),
                     ),
@@ -330,33 +330,33 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            children: [
-              _buildQuickActionCard(
-                context,
-                icon: Icons.inventory_2_outlined,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          children: [
+            _buildQuickActionCard(
+              context,
+              icon: Icons.inventory_2_outlined,
                 title: 'Gestionar\nProductos',
-                onTap: () => router.push('/commerce-products'),
-              ),
-              _buildQuickActionCard(
-                context,
-                icon: Icons.receipt_long_outlined,
+              onTap: () => router.push('/commerce-products'),
+            ),
+            _buildQuickActionCard(
+              context,
+              icon: Icons.receipt_long_outlined,
                 title: 'Ver\nPedidos',
-                onTap: () => router.push('/commerce-orders'),
-              ),
+              onTap: () => router.push('/commerce-orders'),
+            ),
               _buildQuickActionCard(
                 context,
                 icon: Icons.local_offer_outlined,
                 title: 'Gestionar\nPromociones',
                 onTap: () => router.push('/commerce-promotions'),
               ),
-              _buildQuickActionCard(
-                context,
-                icon: Icons.analytics_outlined,
+            _buildQuickActionCard(
+              context,
+              icon: Icons.analytics_outlined,
                 title: 'Ver\nEstadísticas',
                 onTap: () => router.push('/commerce-stats'),
               ),
@@ -389,9 +389,9 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                 AppColors.productsGradientEnd.withOpacity(0.9),
               ]
               : [
-                AppColors.productsGradientStart,
-                AppColors.productsGradientEnd,
-              ];
+        AppColors.productsGradientStart,
+        AppColors.productsGradientEnd,
+      ];
       iconBackgroundColor = AppColors.productsGradientStart.withOpacity(0.2);
       iconColor = AppColors.productsGradientEnd;
     } else if (title.contains('Pedidos')) {
@@ -422,9 +422,9 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                 AppColors.analyticsGradientEnd.withOpacity(0.9),
               ]
               : [
-                AppColors.analyticsGradientStart,
-                AppColors.analyticsGradientEnd,
-              ];
+        AppColors.analyticsGradientStart,
+        AppColors.analyticsGradientEnd,
+      ];
       iconBackgroundColor = AppColors.analyticsGradientStart.withOpacity(0.2);
       iconColor = AppColors.analyticsGradientEnd;
     }
@@ -437,7 +437,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
         side: BorderSide(color: gradient[0].withOpacity(0.2), width: 1),
       ),
       child: InkWell(
-        onTap: onTap,
+      onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -475,7 +475,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             ],
           ),
         ),
-      ),
+          ),
     );
   }
 
@@ -511,8 +511,8 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
-              title: Row(
-                children: [
+            title: Row(
+              children: [
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -533,7 +533,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.notifications_outlined,
+                  Icons.notifications_outlined,
                       color: Colors.white,
                       size: 24,
                     ),
@@ -547,13 +547,13 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                ],
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                children: [
                     _buildNotificationItem(
                       context: dialogContext,
                       icon: Icons.shopping_bag_outlined,
@@ -669,7 +669,7 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
             ),
           ],
         ),
-      ),
+          ),
     );
   }
 
@@ -984,8 +984,8 @@ class _CommerceHomeScreenState extends ConsumerState<CommerceHomeScreen> {
                     ),
                     SliverToBoxAdapter(child: _buildQuickActions(theme)),
                     const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                  ],
-                ),
+          ],
+        ),
       ),
     );
   }

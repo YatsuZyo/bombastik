@@ -3,10 +3,14 @@
 import 'package:bombastik/domain/use_cases/client_login.dart';
 import 'package:bombastik/config/themes/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bombastik/config/router/app_router.dart';
 import 'package:bombastik/infrastructure/services/auth_service.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ClientLoginScreen extends ConsumerStatefulWidget {
   const ClientLoginScreen({super.key});
@@ -19,6 +23,8 @@ class _ClientLoginScreenState extends ConsumerState<ClientLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isButtonPressed = false;
 
   @override
   void dispose() {
@@ -67,7 +73,58 @@ class _ClientLoginScreenState extends ConsumerState<ClientLoginScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        builder:
+            (context) => Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E3A4C).withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Iniciando sesión...',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
       );
 
       final authService = AuthService();
@@ -112,261 +169,402 @@ class _ClientLoginScreenState extends ConsumerState<ClientLoginScreen> {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final isLoading = ref.watch(clientLoginControllerProvider).isLoading;
-    final backgroundImage =
-        isDarkMode
-            ? 'assets/images/background_image_loginDarkMode.png'
-            : 'assets/images/background_image_login.png';
 
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(backgroundImage),
-            fit: BoxFit.cover,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.lightGradientStart, AppColors.lightGradientEnd],
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                constraints: const BoxConstraints(
-                  maxWidth: 500,
-                  minHeight: 600, // Aumentamos la altura mínima
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isDarkMode
-                          ? const Color.fromARGB(
-                            255,
-                            69,
-                            68,
-                            68,
-                          ).withOpacity(0.95)
-                          : Colors.white.withOpacity(0.94),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  // Botón de retroceso
+                  Row(
                     children: [
-                      Text(
-                        '¡Hola!',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '¡Bienvenido a Bombastik!',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      Text(
-                        'Inicia sesión',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _emailController,
-                        style: TextStyle(color: theme.colorScheme.onSurface),
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          labelStyle: TextStyle(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.onSurface.withOpacity(
-                                0.3,
+                      IconButton(
+                        onPressed: () => context.pop(),
+                        icon: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
                               ),
-                            ),
+                            ],
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Ingrese su email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Email inválido';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        style: TextStyle(color: theme.colorScheme.onSurface),
-                        decoration: InputDecoration(
-                          labelText: 'Contraseña',
-                          labelStyle: TextStyle(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.onSurface.withOpacity(
-                                0.3,
-                              ),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Ingrese su contraseña';
-                          }
-                          if (value.length < 6) {
-                            return 'Mínimo 6 caracteres';
-                          }
-                          return null;
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // router.push('/forgot-password');
-                          },
-                          child: Text(
-                            '¿Olvidaste tu contraseña?',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  isDarkMode
-                                      ? Colors.white
-                                      : theme.colorScheme.secondary,
-                              decoration: TextDecoration.underline,
-                              decorationColor:
-                                  isDarkMode
-                                      ? Colors.white
-                                      : theme.colorScheme.secondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: isLoading ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child:
-                            isLoading
-                                ? CircularProgressIndicator(
-                                  color: theme.colorScheme.onPrimary,
-                                )
-                                : Text(
-                                  'Iniciar sesión',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        isDarkMode
-                                            ? theme.colorScheme.onBackground
-                                            : theme.colorScheme.onPrimary,
-                                  ),
-                                ),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: Text(
-                          'o',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: _signInWithGoogle,
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          side: BorderSide(
-                            color: theme.colorScheme.onSurface.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/google_icon.png',
-                              height: 24,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Continuar con Google',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            ref.read(appRouterProvider).push('/client-signin');
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "¿No posees una cuenta? ",
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.6),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: '¡Regístrate aquí!',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color:
-                                        isDarkMode
-                                            ? Colors.white
-                                            : theme.colorScheme.secondary,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor:
-                                        isDarkMode
-                                            ? Colors.white
-                                            : theme.colorScheme.secondary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: const Icon(
+                            Icons.arrow_back_outlined,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
                     ],
+                  ).animate().fadeIn().slideX(),
+
+                  const SizedBox(height: 20),
+
+                  // Imagen decorativa
+                  SvgPicture.asset(
+                    'assets/images/loginamico.svg',
+                    height: 220,
+                    width: 220,
+                    fit: BoxFit.contain,
+                  ).animate().fadeIn(delay: 200.ms).scale(delay: 200.ms),
+
+                  const SizedBox(height: 30),
+
+                  // Formulario
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E3A4C).withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Título de Iniciar sesión
+                            Text(
+                              'Iniciar sesión',
+                              style: GoogleFonts.poppins(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ).animate().fadeIn().slideX(delay: 200.ms),
+
+                            const SizedBox(height: 24),
+
+                            // Email
+                            Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E3A4C),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: TextFormField(
+                                controller: _emailController,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Correo Electrónico',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 16,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 25,
+                                    vertical: 20,
+                                  ),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: Icon(
+                                      Icons.email_outlined,
+                                      color: Colors.white70,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su correo';
+                                  }
+                                  if (!value.contains('@')) {
+                                    return 'Ingrese un correo válido';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ).animate().fadeIn().slideX(delay: 300.ms),
+
+                            const SizedBox(height: 16),
+
+                            // Contraseña
+                            Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E3A4C),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: TextFormField(
+                                controller: _passwordController,
+                                obscureText: !_isPasswordVisible,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Contraseña',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 16,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 25,
+                                    vertical: 20,
+                                  ),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        _isPasswordVisible
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        color: Colors.white70,
+                                        size: 22,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su contraseña';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ).animate().fadeIn().slideX(delay: 400.ms),
+
+                            const SizedBox(height: 30),
+
+                            // Botón de inicio de sesión
+                            GestureDetector(
+                              onTapDown:
+                                  (_) =>
+                                      setState(() => _isButtonPressed = true),
+                              onTapUp: (_) {
+                                setState(() => _isButtonPressed = false);
+                                _submit();
+                              },
+                              onTapCancel:
+                                  () =>
+                                      setState(() => _isButtonPressed = false),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      const Color(0xFFFF9800),
+                                      const Color(0xFFF57C00),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    if (!_isButtonPressed)
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFF57C00,
+                                        ).withOpacity(0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child:
+                                      isLoading
+                                          ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                          : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Iniciar Sesión',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              const Icon(
+                                                Icons.login_rounded,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
+                                            ],
+                                          ),
+                                ),
+                              ),
+                            ).animate().fadeIn().scale(delay: 500.ms),
+
+                            const SizedBox(height: 20),
+
+                            // Separador
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    'O continúa con',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: 1,
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+                                ),
+                              ],
+                            ).animate().fadeIn(delay: 600.ms),
+
+                            const SizedBox(height: 20),
+
+                            // Botón de Google
+                            GestureDetector(
+                              onTap: _signInWithGoogle,
+                              child: Container(
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/google_icon.png',
+                                      height: 24,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Continuar con Google',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ).animate().fadeIn().scale(delay: 700.ms),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+
+                  // Footer
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '¿No tienes una cuenta? ',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.push('/client-signin'),
+                          child: Text(
+                            'Regístrate',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).animate().fadeIn(delay: 800.ms),
+
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),

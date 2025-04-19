@@ -17,74 +17,84 @@ class ThemeSwitch extends ConsumerWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         onTap: () {
           ref.read(themeProvider.notifier).toggleTheme();
         },
         child: Container(
-          width: 80,
-          height: 40,
+          width: 64,
+          height: 32,
           decoration: BoxDecoration(
-            color: isDark 
-                ? theme.colorScheme.surface.withOpacity(0.8)
-                : theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark 
+                  ? [
+                      Colors.grey[900]!,
+                      Colors.grey[800]!,
+                    ]
+                  : [
+                      Colors.blue[300]!,
+                      Colors.blue[200]!,
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(30),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: Colors.white.withOpacity(0.2),
               width: 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark 
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.white.withOpacity(0.3),
+                blurRadius: 8,
+                spreadRadius: -2,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Stack(
-            fit: StackFit.expand,
             children: [
               // Sol
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Icon(
-                    Icons.wb_sunny_rounded,
-                    color: isDark
-                        ? theme.colorScheme.onSurface.withOpacity(0.5)
-                        : theme.colorScheme.primary,
-                    size: 20,
-                  ),
-                ),
-              ),
-              // Luna
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    Icons.mode_night_rounded,
-                    color: isDark
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
-                    size: 20,
-                  ),
-                ),
-              ),
-              // Círculo animado
-              AnimatedAlign(
+              AnimatedPositioned(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.3),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ],
+                left: isDark ? 4 : 32,
+                top: 4,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              Colors.grey[600]!,
+                              Colors.grey[700]!,
+                            ]
+                          : [
+                              Colors.yellow[400]!,
+                              Colors.orange[300]!,
+                            ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.orange.withOpacity(0.3),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      isDark ? Icons.nightlight_round : Icons.wb_sunny_rounded,
+                      size: 16,
+                      color: isDark ? Colors.grey[400] : Colors.white,
                     ),
                   ),
                 ),

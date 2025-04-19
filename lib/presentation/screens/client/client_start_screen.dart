@@ -4,6 +4,8 @@ import 'package:bombastik/config/router/app_router.dart';
 import 'package:bombastik/config/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class StartScreen extends ConsumerStatefulWidget {
   const StartScreen({super.key});
@@ -19,60 +21,74 @@ class _StartScreenState extends ConsumerState<StartScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final router = ref.read(appRouterProvider);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          theme.colorScheme.background, // Cambiado de surface a background
-
-      body: SafeArea(
-        top: true,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: Align(
-                alignment: const AlignmentDirectional(0, 0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.darkGradientStart, AppColors.darkGradientEnd]
+                : [AppColors.lightGradientStart, AppColors.lightGradientEnd],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(),
+              // Logo y título
+              Hero(
+                tag: 'bombastikLogo',
+                child: _buildLogoContainer(context),
+              ).animate().fadeIn().scale(),
+              const SizedBox(height: 30),
+              Text(
+                'BOMBASTIK',
+                style: GoogleFonts.poppins(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ).animate().fadeIn().slideY(begin: 0.3),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '¡Tu mejor opción de ahorro!',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ).animate().fadeIn().scale(delay: 400.ms),
+              const Spacer(),
+              // Botones
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
-                      tag: 'bombastikLogo',
-                      child: _buildLogoContainer(context),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Text(
-                        'BOMBASTIK',
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '¡Tu mejor opción de ahorro!',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onBackground.withOpacity(0.7),
-                      ),
-                    ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildStartButton(context, router)
+                        .animate()
+                        .fadeIn()
+                        .scale(delay: 600.ms),
+                    const SizedBox(height: 20),
+                    _buildLoginPrompt(context, router)
+                        .animate()
+                        .fadeIn(delay: 800.ms),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  _buildStartButton(context, router),
-                  const SizedBox(height: 16),
-                  _buildLoginPrompt(context, router),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -80,28 +96,40 @@ class _StartScreenState extends ConsumerState<StartScreen> {
 
   Widget _buildLogoContainer(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final logoAsset =
-        isDarkMode
-            ? 'assets/images/BombastikBlancoSinFondoSized.png'
-            : 'assets/images/BombastikLogoRecortadoRedi.png';
+    final isDark = theme.brightness == Brightness.dark;
+    final logoAsset = isDark
+        ? 'assets/images/BombastikBlancoSinFondoSized.png'
+        : 'assets/images/BombastikLogoRecortadoRedi.png';
 
     return Container(
-      width: 150,
-      height: 150,
+      width: 180,
+      height: 180,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.transparent,
-        image: DecorationImage(
-          fit: BoxFit.contain, // Cambiado de cover a contain para mejor ajuste
-          image: AssetImage(logoAsset),
+        color: Colors.white.withOpacity(0.2),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withOpacity(0.3),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Image.asset(
+        logoAsset,
+        fit: BoxFit.contain,
       ),
     );
   }
 
   Widget _buildStartButton(BuildContext context, router) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isButtonPressed = true),
@@ -112,29 +140,39 @@ class _StartScreenState extends ConsumerState<StartScreen> {
       onTapCancel: () => setState(() => _isButtonPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: _isButtonPressed ? 300 : 250,
+        width: double.infinity,
         height: 60,
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFFF9800),  // Naranja cálido
+              const Color(0xFFF57C00),  // Naranja más profundo
+            ],
+          ),
           borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
           boxShadow: [
             if (!_isButtonPressed)
               BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(0.3),
+                color: const Color(0xFFF57C00).withOpacity(0.3),
                 blurRadius: 10,
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 5),
               ),
           ],
         ),
         child: Center(
           child: Text(
             "¡Empecemos!",
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color:
-                  isDarkMode
-                      ? theme.colorScheme.onBackground
-                      : theme.colorScheme.onPrimary,
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 0.5,
             ),
           ),
         ),
@@ -144,27 +182,36 @@ class _StartScreenState extends ConsumerState<StartScreen> {
 
   Widget _buildLoginPrompt(BuildContext context, router) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: () => router.push('/client-login'),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: '¿Ya tienes una cuenta? ',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onBackground.withOpacity(0.7),
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => router.push('/client-login'),
+        borderRadius: BorderRadius.circular(30),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '¿Ya tienes una cuenta? ',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+                TextSpan(
+                  text: 'Inicia sesión aquí',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-            TextSpan(
-              text: 'Inicia sesión aquí',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
