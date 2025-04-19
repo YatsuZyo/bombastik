@@ -1,8 +1,8 @@
 // lib/infrastructure/routes/app_router.dart
 import 'package:bombastik/presentation/screens/client/cart/cart_screen.dart';
-import 'package:bombastik/presentation/screens/client/client_dashboard/home_screen.dart';
 import 'package:bombastik/presentation/screens/client/client_signin_screen.dart';
 import 'package:bombastik/presentation/screens/client/favorites/favorites_screen.dart';
+import 'package:bombastik/presentation/screens/client/home/home_screen.dart';
 import 'package:bombastik/presentation/screens/client/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -156,50 +156,56 @@ GoRouter appRouter(ref) {
           GoRoute(
             path: '/commerce-home',
             name: 'commerce-home',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const CommerceHomeScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const CommerceHomeScreen(),
+                ),
           ),
           GoRoute(
             path: '/commerce-stats',
             name: 'commerce-stats',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const StatsScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const StatsScreen(),
+                ),
           ),
           GoRoute(
             path: '/commerce-profile',
             name: 'commerce-profile',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const CommerceProfileScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const CommerceProfileScreen(),
+                ),
           ),
           GoRoute(
             path: '/commerce-products',
             name: 'commerce-products',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const ProductsScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const ProductsScreen(),
+                ),
           ),
           GoRoute(
             path: '/commerce-orders',
             name: 'commerce-orders',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const OrdersScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const OrdersScreen(),
+                ),
           ),
           GoRoute(
             path: '/commerce-promotions',
             name: 'commerce-promotions',
-            pageBuilder: (context, state) => NoTransitionPage(
-              key: state.pageKey,
-              child: const PromotionsScreen(),
-            ),
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  key: state.pageKey,
+                  child: const PromotionsScreen(),
+                ),
           ),
         ],
       ),
