@@ -6,6 +6,7 @@ import 'package:bombastik/presentation/providers/client-providers/dashboard/dash
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
   const CustomBottomNavBar({super.key});
@@ -15,18 +16,33 @@ class CustomBottomNavBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final currentIndex = ref.watch(dashboardIndexProvider);
     final router = ref.read(appRouterProvider);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        color: theme.colorScheme.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  theme.colorScheme.surface.withOpacity(0.9),
+                  theme.colorScheme.surface.withOpacity(0.7),
+                ]
+              : [
+                  theme.colorScheme.surface,
+                  theme.colorScheme.surface.withOpacity(0.9),
+                ],
+        ),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.22), // Sombra verde
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: isDark
+                ? theme.colorScheme.primary.withOpacity(0.2)
+                : theme.colorScheme.primary.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -37,40 +53,57 @@ class CustomBottomNavBar extends ConsumerWidget {
             const Spacer(flex: 1),
             _buildNavItem(
               0,
-              Icons.chat_bubble_outline,
+              Icons.chat_bubble_outline_rounded,
+              'Chat',
               currentIndex,
               router,
               ref,
               theme,
+              isDark,
             ),
-            _buildVerticalDivider(theme),
+            _buildVerticalDivider(theme, isDark),
             _buildNavItem(
               1,
-              Icons.favorite_border,
+              Icons.favorite_border_rounded,
+              'Favoritos',
               currentIndex,
               router,
               ref,
               theme,
+              isDark,
             ),
             const Spacer(flex: 1),
-            _buildNavItem(2, Icons.home, currentIndex, router, ref, theme),
+            _buildNavItem(
+              2,
+              Icons.home_rounded,
+              'Inicio',
+              currentIndex,
+              router,
+              ref,
+              theme,
+              isDark,
+            ),
             const Spacer(flex: 1),
             _buildNavItem(
               3,
               Icons.shopping_cart_outlined,
+              'Carrito',
               currentIndex,
               router,
               ref,
               theme,
+              isDark,
             ),
-            _buildVerticalDivider(theme),
+            _buildVerticalDivider(theme, isDark),
             _buildNavItem(
               4,
-              Icons.person_outline,
+              Icons.person_outline_rounded,
+              'Perfil',
               currentIndex,
               router,
               ref,
               theme,
+              isDark,
             ),
             const Spacer(flex: 1),
           ],
@@ -79,22 +112,34 @@ class CustomBottomNavBar extends ConsumerWidget {
     );
   }
 
-  Widget _buildVerticalDivider(ThemeData theme) {
+  Widget _buildVerticalDivider(ThemeData theme, bool isDark) {
     return Container(
       height: 30,
-      width: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      color: theme.colorScheme.onSurface.withOpacity(0.1),
+      width: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            theme.colorScheme.onSurface.withOpacity(0.1),
+            theme.colorScheme.onSurface.withOpacity(0.05),
+            theme.colorScheme.onSurface.withOpacity(0.1),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildNavItem(
     int index,
     IconData icon,
+    String label,
     int currentIndex,
     GoRouter router,
     WidgetRef ref,
     ThemeData theme,
+    bool isDark,
   ) {
     final isSelected = currentIndex == index;
 
@@ -109,28 +154,50 @@ class CustomBottomNavBar extends ConsumerWidget {
           curve: Curves.easeOut,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
-            boxShadow:
-                isSelected
-                    ? [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 10,
-                      ),
-                    ]
-                    : [],
+            gradient: isSelected
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withOpacity(0.8),
+                    ],
+                  )
+                : null,
+            color: isSelected ? null : Colors.transparent,
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
-          child: Center(
-            child: Icon(
-              icon,
-              size: 28,
-              color:
-                  isSelected
-                      ? Colors
-                          .white // Siempre blanco cuando está seleccionado
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: isSelected
+                    ? Colors.white
+                    : theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? Colors.white
                       : theme.colorScheme.onSurface.withOpacity(0.6),
-            ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
